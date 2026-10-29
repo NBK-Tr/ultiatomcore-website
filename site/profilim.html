@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profilim - UltiAtomCore</title>
+  <meta name="description" content="Oyuncu profilin ve skorların.">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="stylesheet" href="assets/css/uac.css">
+  <link rel="stylesheet" href="assets/css/site.css">
+
+</head>
+<body class="uac-site page-profilim">
+  <header class="site-header">
+    <a class="site-brand" href="index.html"><img src="assets/img/logo.png" alt="ultiatomcore logo" width="50" height="50"><span>ultiatomcore</span></a>
+    <button class="site-nav-toggle" type="button" aria-label="Menü" aria-expanded="false">☰</button>
+    <nav class="site-nav" aria-label="Ana menü">
+        <a href="password-challenge.html">Password Challenge</a>
+        <a href="klavye-muharebesi.html">Klavye Muharebesi</a>
+        <a href="son-siginak.html">Son Sığınak</a>
+        <a href="gunun-sirri.html">Günün Sırrı</a>
+        <a href="sifre-olusturucu.html">Şifre Oluşturucu</a>
+        <a href="profilim.html" aria-current="page" class="is-active">Profilim</a>
+        <a href="sohbet.html">Sohbet</a>
+    </nav>
+  </header>
+  <main class="site-main">
+<section class="uac-page uac-profile-page" aria-labelledby="uac-profile-title">
+  <header class="uac-hero uac-hero-small">
+    <p class="uac-eyebrow">Oyuncu merkezi</p>
+    <h1 id="uac-profile-title">Profil</h1>
+    <p class="uac-subtitle">Klavye Muharebesi, Günün Sırrı ve varsa Son Sığınak verilerini tek yerde gör. Aynı oyuncu adı ve PIN kodunu kullandıkça skor geçmişin daha düzenli görünür.</p>
+  </header>
+
+  <section class="uac-section uac-readable" aria-labelledby="profile-info-title">
+    <h2 id="profile-info-title">Profil sayfası ne işe yarar?</h2>
+    <p>UltiAtomCore profil sayfası, farklı oyunlarda aynı oyuncu adıyla oluşan ilerlemeyi tek ekranda toplar. Klavye Muharebesi skorların, Günün Sırrı puanın, günlük seri bilgin ve varsa Son Sığınak başarımların bu sayfadan kontrol edilebilir. Bu sistem hesap açma zorunluluğu yerine oyuncu adı + PIN mantığıyla çalışır.</p>
+    <p>Profilin doğru görünmesi ve başkasının adını kullanamaması için oyunlarda aynı adı ve aynı PIN kodunu kullanman gerekir. Farklı yazılan adlar ayrı oyuncu gibi algılanır. Örneğin bir gün “Naci”, başka gün “naci123” yazarsan sistem bunları farklı profil olarak gösterebilir.</p>
+  </section>
+
+  <section class="uac-profile-hero">
+    <div class="uac-profile-search">
+      <div class="uac-profile-avatar">👤</div>
+      <h2>Birleşik Oyuncu Girişi &amp; Sorgu</h2>
+      <p>Oyuncu adını yazıp profilini görüntüle. PIN kodunu da girersen bu adı kendi adına kilitler veya mevcut hesabına giriş yaparsın.</p>
+      <div class="uac-form-row">
+        <input id="uacProfileName" class="uac-profile-input" maxlength="20" placeholder="Oyuncu adın" autocomplete="off" spellcheck="false">
+        <input id="uacProfilePin" class="uac-profile-input uac-player-pin-input" type="password" maxlength="12" placeholder="PIN (İsteğe bağlı / Giriş için)" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="uac-form-row">
+        <button id="uacProfileLoad" class="uac-btn uac-btn-primary" type="button">Profili Aç / Giriş Yap</button>
+      </div>
+      <div id="uacProfileAuthStatus" class="uac-empty-note" aria-live="polite">Tüm oyun verilerin tek bir Birleşik Oyuncu ID altında toplanır.</div>
+    </div>
+
+    <div class="uac-profile-search">
+      <p class="uac-eyebrow">Birleşik Kimlik &amp; Özet</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div id="uacProfileNameTitle" class="uac-profile-name" style="margin:0;">Oyuncu</div>
+        <span id="uacProfileUidBadge" class="uac-pill" style="font-family:'Share Tech Mono',monospace;color:#00ffcc;border-color:rgba(0,255,204,.35);">ID: -</span>
+      </div>
+      <p id="uacProfileLockBadge" class="uac-empty-note" style="margin:6px 0 12px;">Durum: Sorgulanmadı</p>
+      <div class="uac-stat-grid">
+        <div class="uac-stat"><span>En iyi skor</span><b id="uacProfileBest">0</b></div>
+        <div class="uac-stat"><span>Toplam oyun</span><b id="uacProfileGames">0</b></div>
+        <div class="uac-stat"><span>Günlük seri</span><b id="uacProfileStreak">0</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="uacProfileResult" class="uac-profile-result">
+    <p class="uac-empty-note">Profil yüklemek için isim yaz.</p>
+  </section>
+
+  <details class="uac-platform-card uac-admin-panel-box" style="margin-top:22px;">
+    <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;outline:none;">
+      <div>
+        <h2 style="margin:0 0 4px;font-size:1.15rem;">🔒 Yönetici Doğrulama</h2>
+        <p class="uac-empty-note" style="margin:0;">Yalnızca site yöneticisi içindir. WordPress yönetici oturumu veya özel kurucu anahtarı gerektirir.</p>
+      </div>
+      <span id="uacAdminStatusBadge" class="uac-pill">Standart Oyuncu</span>
+    </summary>
+    <div class="uac-form-row" style="margin-top:14px;">
+      <input id="uacAdminKeyInput" class="uac-profile-input uac-dark-field" type="password" maxlength="40" placeholder="Gizli Kurucu Anahtarı" autocomplete="off">
+      <input id="uacNewAdminKeyInput" class="uac-profile-input uac-dark-field" type="password" maxlength="40" placeholder="Yeni Anahtar Belirle (İsteğe bağlı)" autocomplete="off">
+      <button id="uacAdminLoginBtn" class="uac-btn uac-btn-primary" type="button">Yetkiyi Doğrula</button>
+      <button id="uacAdminLogoutBtn" class="uac-btn" type="button" style="display:none;">Yetkiyi Kapat</button>
+    </div>
+    <div id="uacAdminMsg" class="uac-empty-note" aria-live="polite"></div>
+  </details>
+
+  <section class="uac-section uac-readable" aria-labelledby="profile-data-title">
+    <h2 id="profile-data-title">Hangi bilgiler görünür?</h2>
+    <ul class="uac-feature-list">
+      <li><strong>Klavye Muharebesi:</strong> en iyi skor, en iyi seviye, toplam oyun, toplam kelime ve sıralama bilgileri.</li>
+      <li><strong>Günün Sırrı:</strong> toplam puan, çözülen soru sayısı, günlük seri ve en iyi seri bilgisi.</li>
+      <li><strong>Son Sığınak:</strong> aynı tarayıcıdan oynandıysa en iyi skor, oyun sayısı, boss ve başarım bilgileri.</li>
+    </ul>
+    <p>Bu bilgiler oyuncuya ilerlemesini takip etme imkanı verir. Profil sistemi gerçek ad, adres veya özel bilgi istemez; yalnızca oyunlarda kullanılan oyuncu adı üzerinden çalışır.</p>
+  </section>
+</section>
+  </main>
+  <footer class="site-footer">
+    <nav aria-label="Site bilgileri">
+      <a href="hakkimizda.html">Hakkımızda</a>
+      <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+      <a href="kullanim-sartlari.html">Kullanım Şartları</a>
+      <a href="cerez-politikasi.html">Çerez Politikası</a>
+      <a href="iletisim.html">İletişim</a>
+    </nav>
+    <p>© UltiAtomCore</p>
+  </footer>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/local-api/core.js"></script>
+  <script src="assets/js/local-api/daily-library.js"></script>
+  <script src="assets/js/local-api/klavye-son-siginak.js"></script>
+  <script src="assets/js/local-api/daily-secret.js"></script>
+  <script src="assets/js/local-api/chat-password-platform.js"></script>
+  <script src="assets/js/pages/profilim.js"></script>
+</body>
+</html>

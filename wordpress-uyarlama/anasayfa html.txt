@@ -1,0 +1,122 @@
+<section class="uac-page uac-home uac-platform" aria-labelledby="uac-home-title">
+  <header class="uac-platform-hero">
+    <div class="uac-hero-copy">
+      <p class="uac-eyebrow">Türkçe tarayıcı oyunları</p>
+      <h1 id="uac-home-title">UltiAtomCore</h1>
+      <p class="uac-subtitle">UltiAtomCore; hızlı yazma, mantık, günlük bilmece ve hayatta kalma türlerinde Türkçe mini oyunlar sunan bir oyun platformudur. Oyuncu adını yaz, skorunu kaydet, aynı ad ve PIN ile profilini büyüt.</p>
+      <div class="uac-hero-badges" aria-label="Platform özellikleri">
+        <span class="uac-pill">⚡ Refleks</span>
+        <span class="uac-pill">🧠 Zeka</span>
+        <span class="uac-pill">🏆 Sıralama</span>
+        <span class="uac-pill">💬 Oyuncu sohbeti</span>
+      </div>
+      <div class="uac-platform-actions">
+        <a class="uac-btn uac-btn-primary" href="/klavye-muharebesi/">Klavye Muharebesi Oyna</a>
+        <a class="uac-btn" href="/gunun-sirri/">Günün Sırrını Aç</a>
+        <a class="uac-btn" href="/sifre-olusturucu/">🔑 Şifre Oluşturucu</a>
+        <a class="uac-btn" id="uacHeroProfileLink" href="/profilim/">Profilime Bak</a>
+      </div>
+    </div>
+
+    <aside class="uac-hero-panel" aria-label="Canlı platform özeti">
+      <div class="uac-panel-title">CANLI MERKEZ</div>
+      <div class="uac-live-list" id="uacHomeLive">
+        <div class="uac-live-row"><span>Online</span><b>0</b></div>
+        <div class="uac-live-row"><span>Password kazananı</span><b>0</b></div>
+        <div class="uac-live-row"><span>Günün Sırrı oyuncusu</span><b>0</b></div>
+      </div>
+      <div class="uac-mini-links">
+        <a class="uac-mini-link" href="/sohbet/">Sohbete gir →</a>
+        <a class="uac-mini-link" href="/son-siginak/">Son Sığınak →</a>
+      </div>
+    </aside>
+  </header>
+
+  <section class="uac-stat-grid" aria-label="Platform istatistikleri">
+    <div class="uac-stat"><span>Online</span><b id="uacStatOnline">0</b></div>
+    <div class="uac-stat"><span>Sohbet mesajı</span><b id="uacStatChat">0</b></div>
+    <div class="uac-stat"><span>Günün Sırrı oyuncusu</span><b id="uacStatDaily">0</b></div>
+  </section>
+
+  <div class="uac-platform-grid">
+    <section class="uac-game-matrix" aria-label="Oyunlar">
+      <article class="uac-game-tile">
+        <span class="uac-game-icon">⌨️</span>
+        <h2>Klavye Muharebesi</h2>
+        <p>Ekrandan inen kelimeleri klavyeyle yaz. Her doğru kelime hedefi temizler; hızlı ve hatasız oynarsan combo, seviye ve skor yükselir.</p>
+        <div class="uac-tile-meta"><span>Hızlı yazma</span><span>Combo</span><span>Mobil klavye</span></div>
+        <a class="uac-card-link" href="/klavye-muharebesi/">Savaşa gir →</a>
+      </article>
+
+      <article class="uac-game-tile">
+        <span class="uac-game-icon">🔐</span>
+        <h2>Password Challenge</h2>
+        <p>Gerçek şifre değil, oyun çözümü yazarsın. Her doğru kural yeni şart açar; amaç tüm kuralları aynı anda sağlayan çözümü bulmaktır.</p>
+        <div class="uac-tile-meta"><span>Mantık</span><span>Kural takibi</span><span>Kazananlar</span></div>
+        <a class="uac-card-link" href="/password-challenge/">Kuralları çöz →</a>
+      </article>
+
+      <article class="uac-game-tile">
+        <span class="uac-game-icon">🛡️</span>
+        <h2>Son Sığınak</h2>
+        <p>Haritada hayatta kal, kaynak topla, düşman dalgalarını temizle ve bosslara dayan. En iyi skorun profil alanında görünür.</p>
+        <div class="uac-tile-meta"><span>Hayatta kalma</span><span>Boss</span><span>Loot</span></div>
+        <a class="uac-card-link" href="/son-siginak/">Sığınağa gir →</a>
+      </article>
+
+      <article class="uac-game-tile">
+        <span class="uac-game-icon">🧩</span>
+        <h2>Günün Sırrı</h2>
+        <p>Her gün 03:00 sonrası yeni bilmece açılır. Cevabı bul, serini koru; ipucu kullanırsan çözmek kolaylaşır ama puan azalabilir.</p>
+        <div class="uac-tile-meta"><span>Günlük görev</span><span>Seri</span><span>Profil puanı</span></div>
+        <a class="uac-card-link" href="/gunun-sirri/">Sırrı çöz →</a>
+      </article>
+
+      <article class="uac-game-tile uac-tile-featured">
+        <div>
+          <span class="uac-game-icon">🔑</span>
+          <h2>Akıllı &amp; Kavramsal Şifre Oluşturucu</h2>
+          <p>İstediğin metni veya sayıyı ekle; şehir, ülke, az bilinen derin kavramlar, asal/tek/çift sayılar, mitoloji, uzay ve element havuzlarından her seferinde tamamen rastgele ve benzersiz şifreler üret.</p>
+          <div class="uac-tile-meta"><span>Rastgele Kavramlar</span><span>Tek/Çift/Asal Sayı</span><span>Şehir &amp; Ülke</span><span>Entropi Analizi</span></div>
+        </div>
+        <a class="uac-card-link" href="/sifre-olusturucu/">Şifre oluşturucuyu aç →</a>
+      </article>
+    </section>
+
+    <aside class="uac-side-stack">
+      <section class="uac-platform-card">
+        <h2>Haftanın Klavye Liderleri</h2>
+        <div id="uacHomeKmBoard" class="uac-board-list"><p class="uac-empty-note">İlk skor geldiğinde liste burada görünür.</p></div>
+      </section>
+
+      <section class="uac-platform-card">
+        <h2>Günün Sırrı Sıralaması</h2>
+        <div id="uacHomeDailyBoard" class="uac-board-list"><p class="uac-empty-note">İlk çözüm geldiğinde liste burada görünür.</p></div>
+      </section>
+
+      <section class="uac-platform-card" id="oyuncu-profili">
+        <h2>Oyuncu profili</h2>
+        <p>Oyuncu adını yazıp Aç’a basınca profil sayfasına gidersin. Skor, seri ve oyun özetleri orada geniş ekranda görünür.</p>
+        <div class="uac-form-row">
+          <input id="uacHomeProfileName" maxlength="20" placeholder="Oyuncu adın" autocomplete="off" spellcheck="false">
+          <button class="uac-btn uac-btn-primary" id="uacHomeProfileGo" type="button">Aç</button>
+        </div>
+      </section>
+
+      <section class="uac-platform-card uac-contact-card" id="iletisim">
+        <h2>İletişim</h2>
+        <p>Hata, öneri veya oyun fikri göndermek için buradan ulaşabilirsin.</p>
+        <div class="uac-contact-links" aria-label="UltiAtomCore iletişim bağlantıları">
+          <a class="uac-contact-link" href="https://www.instagram.com/_naci_batin_/" target="_blank" rel="noopener noreferrer"><span>📸</span><b>Instagram</b><small>@_naci_batin_</small></a>
+          <a class="uac-contact-link" href="mailto:nacibatinkosee@gmail.com"><span>✉️</span><b>E-posta</b><small>nacibatinkosee@gmail.com</small></a>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="uac-section uac-readable" aria-labelledby="uac-about-short">
+    <h2 id="uac-about-short">UltiAtomCore nasıl bir site?</h2>
+    <p>Bu site, kısa sürede açılıp oynanabilen tarayıcı oyunlarını tek yerde toplar. Oyunlar hesap açmadan çalışır; oyuncu adı ve PIN sistemi, aynı adı başka cihazda kullanırken basit koruma sağlar. Her oyun farklı beceriye odaklanır: Klavye Muharebesi refleks ve yazma hızını, Password Challenge kural takibini, Günün Sırrı günlük düşünme alışkanlığını, Son Sığınak ise hayatta kalma ve karar verme becerisini öne çıkarır.</p>
+    <p>Sayfalarda oyun açıklamaları, güvenli kullanım notları ve rehber içerikleri bulunur. Sohbet alanı kısa topluluk mesajları içindir; link, spam ve uygunsuz içerik filtrelenir.</p>
+  </section>
+</section>

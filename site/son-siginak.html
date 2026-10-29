@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Son Sığınak - UltiAtomCore</title>
+  <meta name="description" content="2D açık dünya hayatta kalma oyunu: sandık topla, boss dalgalarına dayan.">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="stylesheet" href="assets/css/uac.css">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/son-siginak/css/uac-son-siginak-wp.css">
+</head>
+<body class="uac-site page-son-siginak">
+  <header class="site-header">
+    <a class="site-brand" href="index.html"><img src="assets/img/logo.png" alt="ultiatomcore logo" width="50" height="50"><span>ultiatomcore</span></a>
+    <button class="site-nav-toggle" type="button" aria-label="Menü" aria-expanded="false">☰</button>
+    <nav class="site-nav" aria-label="Ana menü">
+        <a href="password-challenge.html">Password Challenge</a>
+        <a href="klavye-muharebesi.html">Klavye Muharebesi</a>
+        <a href="son-siginak.html" aria-current="page" class="is-active">Son Sığınak</a>
+        <a href="gunun-sirri.html">Günün Sırrı</a>
+        <a href="sifre-olusturucu.html">Şifre Oluşturucu</a>
+        <a href="profilim.html">Profilim</a>
+        <a href="sohbet.html">Sohbet</a>
+    </nav>
+  </header>
+  <main class="site-main">
+    <section class="uacss5-page" aria-labelledby="uacss5-title">
+      <header class="uacss5-hero">
+        <p class="uacss5-eyebrow">2D açık dünya hayatta kalma</p>
+        <h1 id="uacss5-title">Son Sığınak</h1>
+        <p>Açık dünyada dolaş, binalara gir, sandıklardan silah ve destek ekipmanı topla, boss dalgalarına dayan ve liderlik tablosunda yerini al. Sarı/yeşil uyarı alanları boss saldırısıdır; alanda durma.</p>
+      </header>
+
+      <div class="uacss5-shell" id="uacss5-shell">
+        <canvas id="uacss5-canvas" width="1280" height="720" aria-label="Son Sığınak oyun alanı"></canvas>
+        <div class="uacss5-hud" id="uacss5-hud" aria-live="polite">
+          <div class="wide"><span>CAN</span><b id="uacss5-hp">100/100</b><i><em id="uacss5-hpbar"></em></i></div>
+          <div><span>SKOR</span><b id="uacss5-score">0</b></div>
+          <div><span>SÜRE</span><b id="uacss5-time">00:00</b></div>
+          <div><span>BOSS</span><b id="uacss5-boss-time">01:20</b></div>
+          <div><span>DÜŞMAN</span><b id="uacss5-kills">0</b></div>
+          <div><span>BOSS KILL</span><b id="uacss5-bosses">0</b></div>
+          <div><span>SANDIK</span><b id="uacss5-chests">0</b></div>
+          <div><span>LVL</span><b id="uacss5-level">1</b></div>
+          <div class="wide"><span>EKİPMAN</span><b id="uacss5-weapon">Pulse</b></div>
+        </div>
+        <button class="uacss5-sound" id="uacss5-sound" type="button" aria-label="Sesi aç veya kapat">SES: AÇIK</button>
+        <div class="uacss5-toast" id="uacss5-toast"></div>
+        <div class="uacss5-hint" id="uacss5-hint">E / Dokun: Etkileşim</div>
+        <div class="uacss5-task" id="uacss5-task"><span>GÖREV</span><b>Hazırlanıyor...</b></div>
+        <div class="uacss5-rotate" id="uacss5-rotate">Telefonu yatay çevirmen veya tam ekran açman önerilir.</div>
+        <div class="uacss5-mobile-stick" id="uacss5-stick" aria-hidden="true"><i></i></div>
+        <button class="uacss5-action" id="uacss5-action" type="button" aria-label="Etkileşim">E</button>
+        <button class="uacss5-tactical" id="uacss5-tactical" type="button" aria-label="Mayın veya el bombası kullan">F</button>
+        <button class="uacss5-fullscreen" id="uacss5-fullscreen" type="button" aria-label="Tam ekran">⛶</button>
+
+        <div class="uacss5-overlay" id="uacss5-start">
+          <h2>Son Sığınak</h2>
+          <p>Haritada hayatta kal, binaları keşfet, sandıklardan yeni silahlar bul, drone desteği kur ve boss dalgalarına dayan.</p>
+          <div class="uacss5-profile" id="uacss5-profile">Profil hazırlanıyor...</div>
+          <button class="uacss5-perf" id="uacss5-perf" type="button">PERFORMANS: KAPALI</button>
+          <input id="uacss5-name" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="off" inputmode="text" spellcheck="false" placeholder="Oyuncu adın">
+          <div class="uacss5-class-grid" role="radiogroup" aria-label="Karakter seçimi">
+            <button type="button" class="active" data-class="survivor">Hayatta Kalan<br><small>Dengeli + hasar</small></button>
+            <button type="button" data-class="scout">Gezgin<br><small>Çok hızlı, az can</small></button>
+            <button type="button" data-class="engineer">Mühendis<br><small>Loot/sandık avantajı</small></button>
+            <button type="button" data-class="medic">Sıhhiyeci<br><small>İyileşme güçlü</small></button>
+          </div>
+          <button class="uacss5-primary" type="button" id="uacss5-start-btn">OYUNA BAŞLA</button>
+          <p class="uacss5-keys">PC: WASD/Yön tuşları + E, F ile mayın/el bombası. Mobil: Sol joystick + E butonu + F taktik butonu. Telefonlarda tam ekran önerilir.</p>
+        </div>
+
+        <div class="uacss5-overlay" id="uacss5-gameover" hidden>
+          <h2>Oyun Bitti</h2>
+          <div id="uacss5-result" class="uacss5-result"></div>
+          <div class="uacss5-tabs"><button data-period="all" class="active">GENEL</button><button data-period="week">HAFTA</button><button data-period="day">BUGÜN</button></div>
+          <div id="uacss5-leaderboard" class="uacss5-leaderboard"></div>
+          <button class="uacss5-primary" type="button" id="uacss5-restart">YENİDEN BAŞLAT</button>
+        </div>
+      </div>
+
+      <section class="uacss5-info">
+        <h2>Nasıl oynanır?</h2>
+        <p>Canını koru, düşmanları temizle, binalara kapıdan gir, iç mekân sandıklarını topla ve boss zamanlayıcısına dikkat et. Sandıklardan SMG, minigun, keskin nişancı, plazma topu, buz ışını, alev püskürtücü, mayın paketi, el bombası, zırh, kask, çanta ve sınırlı sayıda drone çıkabilir. Silahlar seviye atlar ve evrilir; minigun daha zor seviye alır ama her seviyede daha sert güçlenir. Drone sınırı 4’tür, bina türleri farklı loot verir, görevler ekstra ödül sağlar. Mobilde en iyi deneyim için yatay ekran veya tam ekran önerilir. Skor; süre, düşman, boss, sandık ve seviye bilgisine göre hesaplanır.</p>
+      </section>
+      <noscript>Bu oyunu oynamak için tarayıcında JavaScript açık olmalıdır.</noscript>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <nav aria-label="Site bilgileri">
+      <a href="hakkimizda.html">Hakkımızda</a>
+      <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+      <a href="kullanim-sartlari.html">Kullanım Şartları</a>
+      <a href="cerez-politikasi.html">Çerez Politikası</a>
+      <a href="iletisim.html">İletişim</a>
+    </nav>
+    <p>© UltiAtomCore</p>
+  </footer>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/local-api/core.js"></script>
+  <script src="assets/js/local-api/chat-password-platform.js"></script>
+  <script src="assets/js/local-api/klavye-son-siginak.js"></script>
+  <script src="assets/js/son-siginak-config.js"></script>
+  <script src="assets/son-siginak/js/uac-son-siginak-wp.js"></script>
+</body>
+</html>

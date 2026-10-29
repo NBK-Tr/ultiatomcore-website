@@ -1,0 +1,75 @@
+(() => {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const fmt = n => Number(n || 0).toLocaleString('tr-TR');
+  function getQueryName() {
+    try {
+      const value = new URLSearchParams(location.search).get('name') || '';
+      if (value) {
+        localStorage.setItem('playerName', value);
+        localStorage.setItem('km_player_name', value);
+        localStorage.setItem('uacss5_name', value);
+        history.replaceState(null, '', '/profilim/');
+      }
+      return value;
+    } catch(e) {
+      return '';
+    }
+  }
+  function getSonKey() { return localStorage.getItem('uacss5_player_key') || ''; }
+  async function json(url) { const r = await fetch(url, { credentials: 'same-origin' }); return r.json(); }
+  function box(title, icon, html) { return `<article class="uac-game-profile-box"><h3>${icon} ${esc(title)}</h3>${html}</article>`; }
+  async function loadProfile() {
+    const input = $('#uacProfileName');
+    const result = $('#uacProfileResult');
+    if (!input || !result) return;
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    localStorage.setItem('playerName', name);
+    localStorage.setItem('km_player_name', name);
+    localStorage.setItem('uacss5_name', name);
+    result.innerHTML = '<p class="uac-empty-note">Profil yükleniyor...</p>';
+    let platform = null, secret = null, son = null;
+    try { platform = await json('/wp-json/uac-platform/v1/profile?name=' + encodeURIComponent(name)); } catch(e) { platform = null; }
+    try { secret = await json('/wp-json/uac-secret/v2/profile?name=' + encodeURIComponent(name) + '&device_key=' + encodeURIComponent(localStorage.getItem('uac_daily_device_key') || '')); } catch(e) { secret = null; }
+    try {
+      const key = getSonKey();
+      if (key) son = await json('/wp-json/uac-son-siginak/wp/profile?name=' + encodeURIComponent(name) + '&player_key=' + encodeURIComponent(key));
+    } catch(e) { son = null; }
+    const km = platform?.km;
+    const daily = secret?.profile || platform?.daily;
+    const best = Math.max(Number(km?.best_score || 0), Number(son?.profile?.best_score || 0), Number(daily?.score || 0));
+    if ($('#uacProfileNameTitle')) $('#uacProfileNameTitle').textContent = name;
+    if ($('#uacProfileBest')) $('#uacProfileBest').textContent = fmt(best);
+    if ($('#uacProfileGames')) $('#uacProfileGames').textContent = fmt(Number(km?.total_games || 0) + Number(son?.profile?.games || 0));
+    if ($('#uacProfileStreak')) $('#uacProfileStreak').textContent = fmt(daily?.streak || 0);
+    const parts = [];
+    if (km) {
+      parts.push(box('Klavye Muharebesi', '⌨️', `<ul><li>En iyi skor: <b>${fmt(km.best_score)}</b></li><li>En iyi level: <b>${fmt(km.best_level)}</b></li><li>Toplam oyun: <b>${fmt(km.total_games)}</b></li><li>Toplam kelime: <b>${fmt(km.total_words)}</b></li><li>Genel sıra: <b>${km.rank_all ? '#' + fmt(km.rank_all) : '-'}</b></li><li>Haftalık sıra: <b>${km.rank_week ? '#' + fmt(km.rank_week) : '-'}</b></li></ul>`));
+    } else {
+      parts.push(box('Klavye Muharebesi', '⌨️', '<p class="uac-empty-note">Bu isimle kayıtlı skor yok.</p>'));
+    }
+    if (daily) {
+      parts.push(box('Günün Sırrı', '🧩', `<ul><li>Puan: <b>${fmt(daily.score)}</b></li><li>Çözülen: <b>${fmt(daily.answered)}</b></li><li>Seri: <b>${fmt(daily.streak)}</b></li><li>En iyi seri: <b>${fmt(daily.best_streak)}</b></li><li>Paket: <b>${esc(daily.active_pack_title || '-')}</b></li><li>Gün: <b>${fmt(daily.current_day || 0)}/7</b></li><li>Bugün: <b>${daily.today_done ? 'Tamamlandı' : 'Bekliyor'}</b></li></ul>`));
+    } else {
+      parts.push(box('Günün Sırrı', '🧩', '<p class="uac-empty-note">Henüz Günün Sırrı profili yok.</p>'));
+    }
+    if (son?.found && son.profile) {
+      const p = son.profile;
+      parts.push(box('Son Sığınak', '🛡️', `<ul><li>En iyi skor: <b>${fmt(p.best_score)}</b></li><li>En uzun süre: <b>${fmt(p.best_duration)} sn</b></li><li>Oyun: <b>${fmt(p.games)}</b></li><li>Toplam düşman: <b>${fmt(p.total_kills)}</b></li><li>Boss: <b>${fmt(p.total_bosses)}</b></li><li>Başarım: <b>${fmt(p.achievement_count)}</b></li></ul>`));
+    } else {
+      parts.push(box('Son Sığınak', '🛡️', '<p class="uac-empty-note">Aynı tarayıcıyla Son Sığınak oynanırsa burada görünür.</p>'));
+    }
+    result.innerHTML = `<div class="uac-profile-games">${parts.join('')}</div>`;
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = $('#uacProfileName');
+    const btn = $('#uacProfileLoad');
+    if (!input || !btn) return;
+    input.value = getQueryName() || localStorage.getItem('playerName') || localStorage.getItem('km_player_name') || localStorage.getItem('uacss5_name') || '';
+    btn.addEventListener('click', loadProfile);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') loadProfile(); });
+    if (input.value.trim()) loadProfile();
+  });
+})();

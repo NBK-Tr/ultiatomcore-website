@@ -1,0 +1,5 @@
+<section class="uac-page uac-readable" aria-labelledby="contact-title">
+  <header class="uac-hero uac-hero-small"><p class="uac-eyebrow">İletişim</p><h1 id="contact-title">İletişim</h1><p class="uac-subtitle">Hata bildirimi, öneri, oyun fikri veya siteyle ilgili geri bildirim gönderebilirsin.</p></header>
+  <section class="uac-section"><h2>Ulaşım</h2><p>E-posta: <a href="mailto:nacibatinkosee@gmail.com">nacibatinkosee@gmail.com</a></p><p>Instagram: <a href="https://www.instagram.com/_naci_batin_/" target="_blank" rel="noopener noreferrer">@_naci_batin_</a></p></section>
+  <section class="uac-section"><h2>Ne gönderebilirsin?</h2><ul class="uac-feature-list"><li>Oyunlarda hata veya bozuk buton bildirimi.</li><li>Yeni oyun fikri ve geliştirme önerisi.</li><li>Skor, profil veya sohbet sistemiyle ilgili sorunlar.</li><li>Reklam yerleşimi veya sayfa görünümüyle ilgili geri bildirim.</li></ul></section>
+</section>

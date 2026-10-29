@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sohbet - UltiAtomCore</title>
+  <meta name="description" content="Oyuncular için kısa, filtreli sohbet alanı.">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="stylesheet" href="assets/css/uac.css">
+  <link rel="stylesheet" href="assets/css/site.css">
+
+</head>
+<body class="uac-site page-sohbet">
+  <header class="site-header">
+    <a class="site-brand" href="index.html"><img src="assets/img/logo.png" alt="ultiatomcore logo" width="50" height="50"><span>ultiatomcore</span></a>
+    <button class="site-nav-toggle" type="button" aria-label="Menü" aria-expanded="false">☰</button>
+    <nav class="site-nav" aria-label="Ana menü">
+        <a href="password-challenge.html">Password Challenge</a>
+        <a href="klavye-muharebesi.html">Klavye Muharebesi</a>
+        <a href="son-siginak.html">Son Sığınak</a>
+        <a href="gunun-sirri.html">Günün Sırrı</a>
+        <a href="sifre-olusturucu.html">Şifre Oluşturucu</a>
+        <a href="profilim.html">Profilim</a>
+        <a href="sohbet.html" aria-current="page" class="is-active">Sohbet</a>
+    </nav>
+  </header>
+  <main class="site-main">
+<section class="uac-page uac-chat" aria-labelledby="chat-title">
+  <header class="uac-hero uac-hero-small">
+    <p class="uac-eyebrow">Topluluk alanı</p>
+    <h1 id="chat-title">UltiAtomCore Sohbet</h1>
+    <p class="uac-subtitle">Kısa ve temiz mesajlar bırak. Sohbete yazmak için önce herhangi bir UltiAtomCore oyununda kayıt oluşturmak gerekir; spam, link ve uygunsuz içerik engellenir.</p>
+  </header>
+
+  <section class="uac-section uac-readable" aria-labelledby="chat-rules-title">
+    <h2 id="chat-rules-title">Sohbet kuralları</h2>
+    <p>Bu sayfa, UltiAtomCore oyuncularının birbirine kısa mesaj bırakabileceği topluluk alanıdır. Sohbeti herkes okuyabilir; yazmak için Klavye Muharebesi, Password Challenge veya Günün Sırrı oyunlarından en az birinde aynı oyuncu adıyla kayıt/skor oluşturmak gerekir. Selamlaşma ve oyun içi kısa kısaltmalar sorun değildir; amaç rastgele harf yığınlarını ve bot mesajlarını temiz tutmaktır.</p>
+    <ul class="uac-feature-list">
+      <li>Mesaj sınırı 120 karakterdir; kısa ve anlaşılır yaz.</li>
+      <li>Sohbete yazmak için önce herhangi bir oyunda aynı oyuncu adı + PIN ile kayıt/skor oluşturmalısın. Sohbeti okumak serbesttir.</li>
+      <li>Link, reklam, otomatik spam ve birebir aynı mesajı tekrar tekrar göndermek engellenir.</li>
+      <li>Oyuncu adı 20 karakterle sınırlıdır ve sistem/yönetici isimleri kullanılamaz.</li>
+      <li>Anlamsız test mesajları, rastgele harf yığınları ve uygunsuz mesajlar silinebilir; bazı isimler sohbetten engellenebilir.</li>
+    </ul>
+  </section>
+<div id="chatWrapper" class="uac-chat-box">
+    <div id="chatHeader">
+      <strong>💬 Sohbet</strong>
+      <span id="onlineCount">0 online</span>
+    </div>
+
+    <div id="chatBox" aria-live="polite"></div>
+
+    <div id="chatGateBox" class="uac-chat-gate" aria-live="polite">
+      <strong>Yazma kilidi:</strong> Sohbete mesaj göndermek için önce aynı oyuncu adı ve PIN ile herhangi bir oyunu tamamla.
+      <div class="uac-chat-gate-links">
+        <a href="klavye-muharebesi.html">Klavye Muharebesi</a>
+        <a href="password-challenge.html">Password Challenge</a>
+        <a href="gunun-sirri.html">Günün Sırrı</a>
+      </div>
+    </div>
+
+    <div id="chatInputArea">
+      <input id="chatName" maxlength="20" placeholder="Oyuncu adın" autocomplete="off" spellcheck="false">
+      <input id="chatPin" class="uac-player-pin-input" type="password" maxlength="12" placeholder="PIN" autocomplete="off" spellcheck="false">
+      <input id="chatMessage" maxlength="120" placeholder="Mesaj yaz..." autocomplete="off" spellcheck="false">
+      <input id="chatWebsite" class="uac-honeypot" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;">
+      <button id="sendChat" type="button">Gönder</button>
+    </div>
+
+    <div id="chatNotice"></div>
+    <p class="uac-chat-note">Mesaj sınırı 120 karakterdir. Sohbete yazma hakkı için aynı oyuncu adı ve PIN ile en az bir oyun kaydı gerekir; kısa selamlar serbesttir, bot denemeleri engellenir.</p>
+  </div>
+<section class="uac-section uac-readable" aria-labelledby="chat-safe-title">
+    <h2 id="chat-safe-title">Güvenli kullanım notu</h2>
+    <p>Sohbette telefon numarası, adres, okul bilgisi, hesap şifresi veya özel kimlik bilgisi paylaşmamalısın. Bu alan oyun içi kısa iletişim içindir. Bir hata, öneri veya reklamla ilgili problem bildirmek istersen ana sayfadaki e-posta veya Instagram bağlantısından ulaşabilirsin.</p>
+    <p>Sohbet mesajları kısa süreli topluluk akışı mantığıyla çalışır. Amaç uzun forum tartışması değil; oyuncuların oyunla ilgili küçük notlar, skor denemeleri ve kısa öneriler paylaşmasıdır.</p>
+  </section>
+</section>
+  </main>
+  <footer class="site-footer">
+    <nav aria-label="Site bilgileri">
+      <a href="hakkimizda.html">Hakkımızda</a>
+      <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+      <a href="kullanim-sartlari.html">Kullanım Şartları</a>
+      <a href="cerez-politikasi.html">Çerez Politikası</a>
+      <a href="iletisim.html">İletişim</a>
+    </nav>
+    <p>© UltiAtomCore</p>
+  </footer>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/local-api/core.js"></script>
+  <script src="assets/js/local-api/daily-library.js"></script>
+  <script src="assets/js/local-api/klavye-son-siginak.js"></script>
+  <script src="assets/js/local-api/daily-secret.js"></script>
+  <script src="assets/js/local-api/chat-password-platform.js"></script>
+  <script src="assets/js/pages/sohbet.js"></script>
+</body>
+</html>

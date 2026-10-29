@@ -1,0 +1,1162 @@
+/* UltiAtomCore - Modernize Edilmis Site Iskeleti & UI Katmani */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #030712; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 204, 0.24);
+  border-radius: 999px;
+  border: 2px solid #030712;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 204, 0.48); }
+
+body.uac-site {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 12% 6%, rgba(0, 255, 204, 0.11), transparent 28%),
+    radial-gradient(circle at 88% 14%, rgba(0, 180, 255, 0.11), transparent 28%),
+    radial-gradient(circle at 50% 92%, rgba(168, 85, 247, 0.07), transparent 34%),
+    linear-gradient(180deg, #030712 0%, #06101e 48%, #030610 100%) !important;
+  color: #f5fbff;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+}
+
+/* Modern Koyu Cam (Glassmorphism) Header - Statik Site Icin */
+body.uac-site .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(16px, 3.5vw, 42px);
+  background: rgba(4, 9, 20, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(0, 255, 204, 0.18);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.55);
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none !important;
+  color: #f8fafc;
+  font-family: 'Orbitron', 'Segoe UI', sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.site-brand:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+}
+.site-brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 204, 0.45);
+  box-shadow: 0 0 16px rgba(0, 255, 204, 0.25);
+}
+.site-brand span {
+  background: linear-gradient(90deg, #00ffcc 0%, #67e8f9 60%, #e0f2fe 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(0, 255, 204, 0.25);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.site-nav a {
+  color: #cbd5e1;
+  text-decoration: none !important;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.site-nav a:hover {
+  color: #00ffcc;
+  background: rgba(0, 255, 204, 0.08);
+  border-color: rgba(0, 255, 204, 0.25);
+  transform: translateY(-1px);
+}
+.site-nav a.is-active,
+.site-nav a[aria-current="page"] {
+  color: #021310 !important;
+  background: linear-gradient(135deg, #00ffcc, #38bdf8);
+  border-color: transparent;
+  font-weight: 800;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.32);
+}
+
+/* Header aktif oyuncu rozeti */
+.site-player-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(0, 255, 204, 0.09);
+  border: 1px solid rgba(0, 255, 204, 0.28);
+  color: #00ffcc !important;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+.site-player-chip:hover {
+  background: rgba(0, 255, 204, 0.18);
+  box-shadow: 0 0 16px rgba(0, 255, 204, 0.22);
+}
+
+.site-nav-toggle {
+  display: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #00ffcc;
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  border-radius: 10px;
+  font-size: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.site-main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+/* Genisletilmis ve Dengelenmis Ana Konteyner + Baslik Kirilma duzeltmesi */
+body:not(.wp-admin) .uac-page,
+body:not(.wp-admin) .uacss5-page {
+  width: min(100%, 1340px) !important;
+  padding: clamp(18px, 3vw, 36px) !important;
+}
+
+.uac-platform-hero {
+  min-height: auto !important;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr) !important;
+  padding: clamp(20px, 4.5vw, 54px) !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(0, 255, 204, 0.26) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* "UltiAtomCore" kelime bolunmesini ve dar ekranda tasmayi onle */
+.uac-platform-hero h1 {
+  font-size: clamp(24px, 5.2vw, 60px) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.5px !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  max-width: 100% !important;
+  margin-bottom: 16px !important;
+  background: linear-gradient(95deg, #00ffcc 0%, #74f7ff 55%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  text-shadow: 0 0 32px rgba(0, 255, 204, 0.35) !important;
+}
+
+.uac-hero h1 {
+  font-size: clamp(28px, 4.2vw, 52px) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.5px !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+/* Kartlar ve Oyun Kutulari Modernizasyonu */
+.uac-game-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.24s ease, box-shadow 0.24s ease;
+  border: 1px solid rgba(0, 255, 204, 0.2) !important;
+  background:
+    radial-gradient(circle at top right, rgba(0, 255, 204, 0.16), transparent 42%),
+    linear-gradient(155deg, rgba(13, 22, 40, 0.96), rgba(4, 8, 19, 0.98)) !important;
+}
+.uac-game-tile:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 255, 204, 0.55) !important;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 255, 204, 0.14) !important;
+}
+.uac-game-tile.uac-tile-featured {
+  grid-column: 1 / -1;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.22), transparent 45%),
+    radial-gradient(circle at 15% 80%, rgba(0, 255, 204, 0.16), transparent 45%),
+    linear-gradient(145deg, rgba(12, 25, 48, 0.98), rgba(5, 10, 24, 0.98)) !important;
+  border-color: rgba(56, 189, 248, 0.38) !important;
+  min-height: auto;
+}
+
+.uac-stat-grid {
+  margin-bottom: 22px;
+}
+.uac-stat {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(13, 22, 40, 0.88), rgba(5, 10, 22, 0.92)) !important;
+  border: 1px solid rgba(0, 255, 204, 0.16) !important;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.uac-stat:hover {
+  border-color: rgba(0, 255, 204, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* Modernize Footer */
+.site-footer {
+  text-align: center;
+  padding: 32px 20px 40px;
+  border-top: 1px solid rgba(0, 255, 204, 0.16);
+  color: #94a3b8;
+  font-size: 14px;
+  background: rgba(2, 5, 14, 0.92);
+  backdrop-filter: blur(10px);
+}
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.site-footer a {
+  color: #74f7ff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.18s ease;
+}
+.site-footer a:hover {
+  color: #00ffcc;
+  text-decoration: underline;
+}
+
+/* =====================================================================
+ *  AKILLI SIFRE OLUSTURUCU SAYFASI (.uac-pwgen-page)
+ * ===================================================================== */
+.uac-pwgen-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.85fr);
+  gap: 22px;
+  align-items: start;
+}
+.uac-pwgen-controls {
+  display: grid;
+  gap: 20px;
+}
+.uac-pwgen-output-col {
+  position: sticky;
+  top: 86px;
+  display: grid;
+  gap: 18px;
+}
+.uac-pwgen-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.uac-pwgen-card-head h2 {
+  margin: 0;
+  font-size: clamp(18px, 2.2vw, 22px);
+}
+.uac-pwgen-card-head h2 small {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+.uac-pwgen-quick-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.uac-btn-sm {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+}
+.uac-pwgen-custom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.uac-pwgen-custom-grid input,
+.uac-pwgen-select {
+  width: 100%;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 204, 0.28);
+  background: rgba(6, 13, 26, 0.92) !important;
+  color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.uac-pwgen-custom-grid input::placeholder {
+  color: #64748b !important;
+}
+.uac-pwgen-custom-grid input:focus,
+.uac-pwgen-select:focus {
+  border-color: #00ffcc;
+  box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.16);
+}
+.uac-pwgen-select option {
+  background: #07111f;
+  color: #f8fafc;
+}
+.uac-pwgen-slider-row {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.uac-pwgen-slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.uac-pwgen-slider-label b {
+  color: #00ffcc;
+  font-family: 'Orbitron', sans-serif;
+}
+.uac-pwgen-slider-row input[type="range"] {
+  width: 100%;
+  accent-color: #00ffcc;
+  cursor: pointer;
+}
+
+.uac-pwgen-group {
+  margin-bottom: 20px;
+}
+.uac-pwgen-group-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  color: #67e8f9;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid rgba(103, 232, 249, 0.16);
+  padding-bottom: 6px;
+}
+.uac-pwgen-check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.uac-pwgen-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+.uac-pwgen-check:hover {
+  background: rgba(0, 255, 204, 0.07);
+  border-color: rgba(0, 255, 204, 0.32);
+}
+.uac-pwgen-check:has(input:checked) {
+  background: rgba(0, 255, 204, 0.11);
+  border-color: rgba(0, 255, 204, 0.55);
+  box-shadow: inset 0 0 18px rgba(0, 255, 204, 0.06);
+}
+.uac-pwgen-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: #00ffcc;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.uac-pwgen-check span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.uac-pwgen-check b {
+  font-size: 14px;
+  color: #f1f5f9;
+}
+.uac-pwgen-check small {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.uac-pwgen-main-box {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(2, 6, 16, 0.85);
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  box-shadow: inset 0 0 32px rgba(0, 255, 204, 0.06);
+}
+.uac-pwgen-code {
+  display: block;
+  font-family: 'Share Tech Mono', Consolas, monospace;
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: #00ffcc;
+  word-break: break-all;
+  line-height: 1.35;
+  margin-bottom: 14px;
+  text-shadow: 0 0 18px rgba(0, 255, 204, 0.32);
+}
+.uac-pwgen-main-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.uac-pwgen-main-actions .uac-btn {
+  flex: 1 1 130px;
+}
+.uac-pwgen-copy-status {
+  min-height: 22px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffe600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.uac-pwgen-copy-status.show {
+  opacity: 1;
+}
+.uac-pwgen-meter-wrap {
+  margin-top: 10px;
+}
+.uac-pwgen-meter-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+.uac-pwgen-meter-head b {
+  color: #67e8f9;
+}
+.uac-pwgen-breakdown-wrap h3,
+.uac-pwgen-variants-wrap h3 {
+  font-size: 14px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 18px 0 10px;
+}
+.uac-pwgen-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.uac-pwgen-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(0, 255, 204, 0.22);
+  font-size: 12.5px;
+}
+.uac-pwgen-tag em { font-style: normal; }
+.uac-pwgen-tag b { color: #00ffcc; font-family: 'Share Tech Mono', monospace; font-size: 13.5px; }
+.uac-pwgen-tag small { color: #cbd5e1; }
+
+.uac-pwgen-variants {
+  display: grid;
+  gap: 8px;
+}
+.uac-pwgen-variant-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 13px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+.uac-pwgen-variant-btn:hover {
+  background: rgba(0, 255, 204, 0.1);
+  border-color: rgba(0, 255, 204, 0.45);
+  transform: translateX(3px);
+}
+.uac-pwgen-variant-btn code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  color: #74f7ff;
+  word-break: break-all;
+}
+.uac-pwgen-variant-btn span {
+  font-size: 11px;
+  font-weight: 800;
+  color: #00ffcc;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0, 255, 204, 0.12);
+  flex-shrink: 0;
+}
+
+@media (max-width: 980px) {
+  .uac-pwgen-layout {
+    grid-template-columns: 1fr;
+  }
+  .uac-pwgen-output-col {
+    position: static;
+  }
+}
+
+@media (max-width: 1024px) {
+  .site-nav-toggle { display: block; }
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    background: rgba(4, 9, 20, 0.96);
+    backdrop-filter: blur(18px);
+    padding: 12px 18px 18px;
+    border-bottom: 1px solid rgba(0, 255, 204, 0.22);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.65);
+    z-index: 200;
+  }
+  .site-nav.open { display: flex; }
+  .site-nav a {
+    padding: 11px 14px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .uac-pwgen-custom-grid,
+  .uac-pwgen-check-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.uac-profile-games {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+.uac-dark-field,
+.uac-profile-input {
+  background: rgba(5, 11, 24, 0.85) !important;
+  color: #e8fff9 !important;
+  border: 1px solid rgba(0, 255, 204, 0.22) !important;
+  border-radius: 12px !important;
+  padding: 11px 14px !important;
+}
+.uac-dark-field:focus,
+.uac-profile-input:focus {
+  border-color: rgba(0, 255, 204, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.14) !important;
+  outline: none !important;
+}
+.uac-admin-panel-box summary::-webkit-details-marker {
+  display: none;
+}
+@media (max-width: 760px) {
+  .uac-profile-games {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* === WORDPRESS ASTRA & BLOK TEMA HEADER, FOOTER VE BASLIK KOYU MOD UYUMLULUGU === */
+body:not(.wp-admin):not(.uac-site) #masthead,
+body:not(.wp-admin):not(.uac-site) header.site-header,
+body:not(.wp-admin) header.wp-block-template-part,
+body:not(.wp-admin) .wp-site-blocks > header {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: rgba(4, 9, 20, 0.90) !important;
+  background-color: rgba(4, 9, 20, 0.90) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.18) !important;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.55) !important;
+}
+
+body:not(.wp-admin) #ast-desktop-header,
+body:not(.wp-admin) #ast-mobile-header,
+body:not(.wp-admin) .ast-main-header-wrap,
+body:not(.wp-admin) .main-header-bar-wrap,
+body:not(.wp-admin) .ast-primary-header-bar,
+body:not(.wp-admin) .main-header-bar,
+body:not(.wp-admin) .ast-above-header-bar,
+body:not(.wp-admin) .ast-below-header-bar,
+body:not(.wp-admin) .ast-mobile-header-wrap .ast-primary-header-bar,
+body:not(.wp-admin) .ast-mobile-popup-inner {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: rgba(4, 9, 20, 0.92) !important;
+  background-color: rgba(4, 9, 20, 0.92) !important;
+  border-bottom-color: rgba(0, 255, 204, 0.16) !important;
+  color: #f5fbff !important;
+}
+
+body:not(.wp-admin) #masthead .site-primary-header-wrap,
+body:not(.wp-admin) #masthead .ast-builder-grid-row-container,
+body:not(.wp-admin) #masthead .main-header-container,
+body:not(.wp-admin) #masthead .ast-container {
+  width: min(100%, 1340px) !important;
+  max-width: 1340px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: clamp(16px, 3vw, 36px) !important;
+  padding-right: clamp(16px, 3vw, 36px) !important;
+}
+
+body:not(.wp-admin) header .wp-block-group,
+body:not(.wp-admin) header.wp-block-template-part > *,
+body:not(.wp-admin) header .has-background,
+body:not(.wp-admin) header .has-base-background-color,
+body:not(.wp-admin) header .has-white-background-color {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #f5fbff !important;
+  box-shadow: none !important;
+}
+
+body:not(.wp-admin) header .wp-block-site-title,
+body:not(.wp-admin) header .wp-block-site-title a,
+body:not(.wp-admin) #masthead .site-title,
+body:not(.wp-admin) #masthead .site-title a,
+body:not(.wp-admin) .ast-site-identity .site-title a {
+  font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  color: #00ffcc !important;
+  text-decoration: none !important;
+  text-shadow: 0 0 20px rgba(0, 255, 204, 0.3) !important;
+}
+
+body:not(.wp-admin) header .wp-block-site-logo img,
+body:not(.wp-admin) #masthead .custom-logo,
+body:not(.wp-admin) .ast-site-identity img {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(0, 255, 204, 0.45) !important;
+  box-shadow: 0 0 16px rgba(0, 255, 204, 0.25) !important;
+}
+
+body:not(.wp-admin) #masthead .main-header-menu .menu-link,
+body:not(.wp-admin) #masthead .menu-item > a,
+body:not(.wp-admin) header nav a,
+body:not(.wp-admin) header .wp-block-navigation a,
+body:not(.wp-admin) header .wp-block-navigation-item__content {
+  color: #cbd5e1 !important;
+  text-decoration: none !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 8px 13px !important;
+  border-radius: 999px !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+body:not(.wp-admin) #masthead .main-header-menu .menu-item:hover > .menu-link,
+body:not(.wp-admin) #masthead .main-header-menu .menu-link:hover,
+body:not(.wp-admin) header nav a:hover,
+body:not(.wp-admin) header .wp-block-navigation a:hover,
+body:not(.wp-admin) header .wp-block-navigation-item__content:hover {
+  color: #00ffcc !important;
+  background: rgba(0, 255, 204, 0.09) !important;
+  border-color: rgba(0, 255, 204, 0.28) !important;
+}
+
+body:not(.wp-admin) #masthead .main-header-menu .current-menu-item > .menu-link,
+body:not(.wp-admin) #masthead .main-header-menu .current_page_item > .menu-link,
+body:not(.wp-admin) header nav a[aria-current="page"],
+body:not(.wp-admin) header .wp-block-navigation .current-menu-item > a,
+body:not(.wp-admin) header .wp-block-navigation a.is-active {
+  color: #021310 !important;
+  background: linear-gradient(135deg, #00ffcc, #38bdf8) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 18px rgba(0, 255, 204, 0.32) !important;
+}
+
+body:not(.wp-admin) #masthead .ast-button-wrap .menu-toggle {
+  background: rgba(0, 255, 204, 0.1) !important;
+  border: 1px solid rgba(0, 255, 204, 0.35) !important;
+  border-radius: 10px !important;
+  color: #00ffcc !important;
+}
+body:not(.wp-admin) #masthead .ast-mobile-svg {
+  fill: #00ffcc !important;
+}
+
+body:not(.wp-admin) footer,
+body:not(.wp-admin) #colophon,
+body:not(.wp-admin) .site-footer,
+body:not(.wp-admin) .site-primary-footer-wrap,
+body:not(.wp-admin) .site-below-footer-wrap,
+body:not(.wp-admin) footer.wp-block-template-part,
+body:not(.wp-admin) footer .wp-block-group {
+  background: rgba(3, 7, 18, 0.94) !important;
+  background-color: rgba(3, 7, 18, 0.94) !important;
+  border-top-color: rgba(0, 255, 204, 0.16) !important;
+  color: #94a3b8 !important;
+}
+
+/* Kart ve Bolum Basliklarinin Siyah Olmasini Engelle */
+body:not(.wp-admin) .uac-page h1,
+body:not(.wp-admin) .uac-page h2,
+body:not(.wp-admin) .uac-page h3,
+body:not(.wp-admin) .uac-platform-card h2,
+body:not(.wp-admin) .uac-platform-card h3,
+body:not(.wp-admin) .uac-section h2,
+body:not(.wp-admin) .uac-card h2,
+body:not(.wp-admin) .uac-game-tile h2 {
+  color: #00ffcc !important;
+}
+
+/* =====================================================================
+ *  MOBIL VE TABLET TAM DUYARLI (RESPONSIVE) DUZEN & ETKILESIM YAMASI
+ *  (Hem Statik HTML hem WordPress Astra icin %100 uyumlu)
+ * ===================================================================== */
+html, body {
+  overflow-x: clip !important;
+  max-width: 100vw !important;
+}
+
+body:not(.wp-admin) .uac-page,
+body:not(.wp-admin) .uacss5-page,
+body:not(.wp-admin) .uac-platform-hero,
+body:not(.wp-admin) .uac-platform-card,
+body:not(.wp-admin) .uac-game-tile,
+body:not(.wp-admin) .uac-section,
+body:not(.wp-admin) .uac-card {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* WordPress Astra Mobil Cekmece (Drawer) ve Mobil Header Duzeltmesi */
+body:not(.wp-admin) .ast-mobile-popup-drawer .ast-mobile-popup-inner,
+body:not(.wp-admin) .ast-mobile-header-content,
+body:not(.wp-admin) #ast-mobile-header .ast-mobile-header-content {
+  background: #040914 !important;
+  background-color: #040914 !important;
+  color: #f5fbff !important;
+  border-left: 1px solid rgba(0, 255, 204, 0.22) !important;
+}
+
+body:not(.wp-admin) .ast-mobile-popup-drawer .main-header-menu .menu-link,
+body:not(.wp-admin) #ast-mobile-header .main-header-menu .menu-link,
+body:not(.wp-admin) .ast-header-break-point #masthead .main-header-menu .menu-link {
+  color: #e2e8f0 !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+  border-radius: 10px !important;
+  display: block !important;
+  font-size: 15px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body:not(.wp-admin) .ast-mobile-popup-drawer .menu-toggle-close,
+body:not(.wp-admin) #ast-mobile-header .menu-toggle {
+  color: #00ffcc !important;
+}
+
+/* Tablet ve Kucuk Laptop Görünümü (<= 1024px) */
+@media (max-width: 1024px) {
+  body:not(.wp-admin) .uac-page,
+  body:not(.wp-admin) .uacss5-page {
+    width: 100% !important;
+    padding: 14px 12px 24px !important;
+  }
+
+  .uac-platform-hero {
+    grid-template-columns: 1fr !important;
+    padding: 22px 18px !important;
+    gap: 18px !important;
+    border-radius: 22px !important;
+  }
+
+  .uac-platform-hero > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .uac-platform-grid,
+  .uac-daily-stage,
+  .uac-profile-hero,
+  .uac-pwgen-layout,
+  .uac-article-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .uac-game-matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  .uac-game-tile.uac-tile-featured {
+    grid-column: 1 / -1 !important;
+  }
+
+  .uac-profile-games {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* iOS ve Android klavye acildiginda otomatik sayfa yakinlastirmasini (zoom) engelle */
+  input,
+  textarea,
+  select,
+  .uac-dark-field,
+  .uac-profile-input,
+  #password,
+  #playerName,
+  #playerPin,
+  #player-name-input,
+  #player-pin-input,
+  #uacDailyName,
+  #uacDailyPin,
+  #uacDailyAnswer,
+  #uacChatName,
+  #uacChatPin,
+  #uacChatMessage,
+  #uacProfileInput,
+  #uacProfilePin,
+  #uacss5-name {
+    font-size: 16px !important;
+  }
+}
+
+/* Telefon ve Dikey Tablet Görünümü (<= 768px) */
+@media (max-width: 768px) {
+  .site-header {
+    padding: 10px 14px !important;
+  }
+
+  .site-brand span {
+    font-size: 17px !important;
+  }
+
+  .site-brand img {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  body:not(.wp-admin) .uac-page,
+  body:not(.wp-admin) .uacss5-page {
+    padding: 10px 10px 22px !important;
+  }
+
+  .uac-platform-hero {
+    padding: 18px 14px !important;
+    border-radius: 18px !important;
+    gap: 14px !important;
+  }
+
+  .uac-platform-hero h1 {
+    font-size: clamp(24px, 7.8vw, 36px) !important;
+    line-height: 1.12 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .uac-hero {
+    padding: 18px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .uac-hero h1,
+  #klavye-title.game-title {
+    font-size: clamp(24px, 7.5vw, 34px) !important;
+    line-height: 1.15 !important;
+  }
+
+  .uac-game-matrix,
+  .uac-stat-grid,
+  .uac-grid,
+  .uac-steps,
+  .uac-pwgen-custom-grid,
+  .uac-pwgen-check-grid,
+  .uac-profile-stats {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .uac-form-row,
+  .uac-daily-auth,
+  .uac-daily-answer-row,
+  .uac-chat-compose,
+  .uac-profile-search,
+  .uac-pwgen-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .uac-form-row > *,
+  .uac-daily-auth > *,
+  .uac-daily-answer-row > *,
+  .uac-chat-compose > *,
+  .uac-profile-search > *,
+  .uac-pwgen-actions > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .uac-hero-actions,
+  .uac-hub-links,
+  .uac-chip-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .uac-hero-actions .uac-btn {
+    flex: 1 1 calc(50% - 8px) !important;
+    min-width: 140px !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 11px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .uac-section,
+  .uac-platform-card,
+  .uac-game-panel,
+  .uac-daily-card,
+  .uac-daily-side > div,
+  .uac-pwgen-card {
+    padding: 16px 13px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Password Challenge Mobil Iyilestirme */
+  #game.uac-game-panel #password {
+    width: 100% !important;
+    padding: 13px 12px !important;
+    font-size: 16px !important;
+  }
+
+  .uac-pw-mobile-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 10px;
+  }
+
+  .uac-pw-mobile-tools button {
+    flex: 1 1 auto;
+    padding: 8px 11px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    background: rgba(5, 14, 28, 0.85);
+    color: #00ffcc;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 420px) {
+  .uac-hero-actions .uac-btn {
+    flex: 1 1 100% !important;
+  }
+}
+
+/* =====================================================================
+ *  KLAVYE MUHAREBESI: ENTEGRE DOKUNMATIK TURKCE OYUN KLAVYESI & MOBIL MOD
+ * ===================================================================== */
+#km-touch-keyboard {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 35;
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, rgba(3, 8, 20, 0.92), rgba(2, 5, 14, 0.98));
+  border-top: 1px solid rgba(0, 245, 255, 0.32);
+  backdrop-filter: blur(8px);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+#z-game-wrapper.km-touch-active #km-touch-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.km-kb-row {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.km-kb-key {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(0, 245, 255, 0.28);
+  border-radius: 7px;
+  background: rgba(12, 25, 48, 0.92);
+  color: #ecfeff;
+  font-family: 'Orbitron', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+   display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.km-kb-key:active,
+.km-kb-key.is-pressed {
+  background: #00ffcc;
+  color: #021310;
+  border-color: #ffffff;
+  transform: scale(0.95);
+}
+
+.km-kb-key.km-kb-wide {
+  flex: 1.45 1 0;
+  font-size: 11px;
+  background: rgba(255, 34, 85, 0.22);
+  border-color: rgba(255, 34, 85, 0.5);
+  color: #fda4af;
+}
+
+.km-kb-key.km-kb-mode {
+  flex: 1.65 1 0;
+  font-size: 10px;
+  background: rgba(0, 255, 204, 0.14);
+  border-color: rgba(0, 255, 204, 0.45);
+  color: #00ffcc;
+}
+
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+  #z-game-wrapper {
+    height: min(78dvh, 660px) !important;
+    min-height: 480px !important;
+    touch-action: manipulation !important;
+  }
+
+  #z-game-wrapper .overlay {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    justify-content: flex-start !important;
+    padding: 64px 14px 28px !important;
+  }
+
+  #z-game-wrapper .overlay button,
+  #z-game-wrapper .overlay input,
+  #z-game-wrapper .skin-opt {
+    touch-action: manipulation !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* =====================================================================
+ *  SES ACMA / KISMA CUBUGU (VOLUME SLIDER) GARANTISI (TUM SESLI OYUNLAR)
+ * ===================================================================== */
+#z-hud {
+  z-index: 150 !important;
+}
+
+#mute-hud {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 155 !important;
+}
+
+#z-hud #volume-slider,
+.uac-volume-slider {
+  -webkit-appearance: auto !important;
+  appearance: auto !important;
+  pointer-events: auto !important;
+  touch-action: pan-x !important;
+  cursor: pointer !important;
+  accent-color: #00ffcc !important;
+  width: 72px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 24px !important;
+  padding: 0 !important;
+  margin: 2px 0 0 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: relative !important;
+  z-index: 160 !important;
+}
+
+.uac-sound-control-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 4px 12px 4px 4px !important;
+  border-radius: 14px !important;
+  background: rgba(6, 14, 28, 0.85) !important;
+  border: 1px solid rgba(0, 255, 204, 0.25) !important;
+}
+
+.uac-sound-control-pill .uac-volume-slider {
+  width: 84px !important;
+  margin: 0 !important;
+}

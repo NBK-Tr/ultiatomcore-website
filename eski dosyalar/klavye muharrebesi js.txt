@@ -1,0 +1,912 @@
+(function () {
+const API_BASE = window.UAC_KM_API_BASE || `${window.location.origin}/wp-json/klavye-muharebesi/v1`;
+let gameSessionToken = '';
+
+async function requestGameSession() {
+  try {
+    const res = await fetch(API_BASE + '/score-start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: playerName || '', player_pin: playerPin || '' })
+    });
+    const data = await res.json();
+    return data && data.ok ? data.session : '';
+  } catch (e) {
+    return '';
+  }
+}
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const wrapper = document.getElementById('z-game-wrapper');
+const scoreEl = document.getElementById('z-score');
+const levelEl = document.getElementById('z-level');
+const bestEl = document.getElementById('z-best');
+const mobileInput = document.getElementById('mobile-input');
+
+function lW() { return wrapper.clientWidth; }
+function lH() { return wrapper.clientHeight; }
+
+const sounds = {
+  laser: new Audio('https://ultiatomcore.com/wp-content/uploads/2026/04/driken5482-retro-laser-1-236669.mp3'),
+  explosion: new Audio('https://ultiatomcore.com/wp-content/uploads/2026/04/freesound_community-explosion-bomb-39205.mp3'),
+  hit: new Audio('https://ultiatomcore.com/wp-content/uploads/2026/04/hit.mp3'),
+  bgm: new Audio('https://ultiatomcore.com/wp-content/uploads/2026/04/idoberg-deep-space-loop-401165.mp3')
+};
+sounds.bgm.loop = true;
+Object.values(sounds).forEach(s => { s.preload = 'auto'; });
+
+function safePlay(a) {
+  try { a.pause(); a.currentTime = 0; a.play().catch(() => {}); } catch (e) {}
+}
+
+const wordBank = {
+  short: { words: ['VERİ','KOD','AĞ','BOT','WEB','CPU','RAM','GPU','DNS','USB','IP','LAN','WAN','PORT','SİTE','DOSYA','HIZ','SİS','SES','TUŞ','LOG','BYTE','PING','NODE','HOST','CACHE','STACK','ARRAY','LOOP','NULL','TRUE','FALSE','SET','GET','POST','PUT','KEY','VAL','MAP','OBJ','API','SDK','UI','UX','DB','OS','APP','DEV','BUG','FIX','RUN','SYS','NET','CMD','BIN','HEX','ID','TAG','ZIP','RAR'], points: 10 },
+  medium: { words: ['YAZILIM','BİLİŞİM','SİSTEM','KLAVYE','DONANIM','BELLEK','SUNUCU','PLATFORM','ARAYÜZ','TASARIM','MODÜL','FONKSİYON','KÜTÜPHANE','GÜNCELLEME','BAĞLANTI','PROTOKOL','ŞİFRELEME','GÜVENLİK','DERLEYİCİ','OTOMASYON','ANALİZ','VERİSETİ','OPTİMİZASYON','YÜKLENİYOR','İŞLETİMSİSTEM','GERİBİLDİRİM','HATAAYIKLAMA','VERİAKIŞI','KODBLOĞU','KULLANICIADI','ŞİFREGİRİŞ','VERİTABANI','SUNUCUHATASI','BAĞLANTIHATASI','GÜVENLİKDUVARI','ERİŞİMİZNİ','KAYITSİSTEMİ','MESAJKUTUSU','BİLGİİŞLEM','VERİMERKEZİ','YAZILIMGÜNCEL','KODDÜZENLEME','İŞLEMBAŞLAT','VERİKONTROL','SİSTEMYÜKÜ','HIZTESTİ','AĞBAĞLANTI'], points: 30 },
+  hard: { words: ['ALGORİTMA','VERİTABANI','PROGRAMLAMA','SİBERGÜVENLİK','YAPAYZEKA','MAKİNEÖĞRENMESİ','VERİMADENCİLİĞİ','BULUTBİLİŞİM','DAĞITIKSİSTEMLER','MİKROSERVİSLER','KRİPTOGRAFİ','PARALELİŞLEME','NESNEYÖNELİMİ','ASENKRONPROGRAMLAMA','MULTITHREADING','ŞİFREÇÖZÜMLEME','VERİYAPILARI','AĞPROTOKOLLERİ','OPTİMİZASYONTEKNİKLERİ','YÜKSEKPERFORMANS','GERÇEKZAMANLISİSTEM','DAĞITIKVERİTABANI','YAPAYSİNİRAĞLARI','DERİNÖĞRENME','BÜYÜKVERİANALİZİ','VERİGÖRSELLEŞTİRME','SİSTEMMİMARİSİ','KAPSÜLLEMEPRENSİBİ','SOYUTLAMAKATMANI','VERİTUTARLILIĞI','YÜKDENGETLEME','HATAKURTARMA','ÖLÇEKLENEBİLİRLİK','GÜVENLİKPOLİTİKASI','OTOMATİKDAĞITIM','SERVİSYÖNETİMİ','İLERİSEVİYEPROGRAMLAMA'], points:70 }
+};
+
+function typeBasedOnWord(word) {
+  const upperWord = word.toLocaleUpperCase('tr-TR');
+  if (wordBank.short.words.includes(upperWord)) return 'short';
+  if (wordBank.medium.words.includes(upperWord)) return 'medium';
+  if (wordBank.hard.words.includes(upperWord)) return 'hard';
+  return 'short';
+}
+
+let selectedSkin = parseInt(localStorage.getItem('km_skin') || '0');
+
+const SKINS = [
+  { color: '#00ff88', glow: '#00ff88', draw: drawShipClassic },
+  { color: '#00aaff', glow: '#00aaff', draw: drawShipSaucer },
+  { color: '#ff5500', glow: '#ffaa00', draw: drawShipFlame },
+  { color: '#aa00ff', glow: '#ff00ff', draw: drawShipCyber }
+];
+
+document.querySelectorAll('.skin-opt').forEach(el => {
+  el.classList.toggle('selected', parseInt(el.dataset.skin) === selectedSkin);
+  el.addEventListener('click', () => {
+    selectedSkin = parseInt(el.dataset.skin);
+    localStorage.setItem('km_skin', selectedSkin);
+    document.querySelectorAll('.skin-opt').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+  });
+});
+
+let stars = [];
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 120; i++) {
+    stars.push({
+      x: Math.random() * lW(),
+      y: Math.random() * lH(),
+      r: Math.random() * 1.8 + 0.2,
+      speed: Math.random() * 0.6 + 0.1,
+      layer: Math.floor(Math.random() * 3),
+      bright: Math.random() * 0.6 + 0.3
+    });
+  }
+}
+
+function drawStars() {
+  stars.forEach(s => {
+    s.y += s.speed * (s.layer + 1) * 0.5;
+    if (s.y > lH() + 4) { s.y = -4; s.x = Math.random() * lW(); }
+    ctx.save();
+    ctx.globalAlpha = s.bright;
+    ctx.fillStyle = ['#fff', '#adf', '#faf'][s.layer];
+    ctx.shadowBlur = s.r > 1.2 ? 4 : 0;
+    ctx.shadowColor = '#adf';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+let particles = [];
+
+function spawnExplosion(x, y, color) {
+  const count = 22;
+  for (let i = 0; i < count; i++) {
+    const ang = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.4;
+    const spd = Math.random() * 4 + 2;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd,
+      life: 1,
+      decay: Math.random() * 0.04 + 0.025,
+      r: Math.random() * 4 + 2,
+      color
+    });
+  }
+  particles.push({ type: 'wave', x, y, r: 0, life: 1, color });
+}
+
+function updateParticles() {
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    if (p.type === 'wave') {
+      p.r += 4;
+      p.life -= 0.06;
+      ctx.save();
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = p.life * 0.5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    } else {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.92;
+      p.vy *= 0.92;
+      p.life -= p.decay;
+      ctx.save();
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  });
+}
+
+function drawShipClassic(ctx, skin) {
+  ctx.strokeStyle = skin.color; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 12; ctx.shadowColor = skin.glow;
+  ctx.beginPath();
+  ctx.moveTo(0, -18); ctx.lineTo(12, 10); ctx.lineTo(0, 4); ctx.lineTo(-12, 10);
+  ctx.closePath(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, 10); ctx.stroke();
+}
+
+function drawShipSaucer(ctx, skin) {
+  ctx.strokeStyle = skin.color; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 12; ctx.shadowColor = skin.glow;
+  ctx.beginPath(); ctx.ellipse(0, 0, 18, 8, 0, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(0, -4, 9, 5, 0, 0, Math.PI); ctx.stroke();
+}
+
+function drawShipFlame(ctx, skin) {
+  ctx.strokeStyle = skin.color; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 14; ctx.shadowColor = skin.glow;
+  ctx.beginPath();
+  ctx.moveTo(0, -20); ctx.lineTo(10, 8); ctx.lineTo(0, 2); ctx.lineTo(-10, 8);
+  ctx.closePath(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,80,0,0.3)'; ctx.fill();
+  ctx.strokeStyle = '#ff8800'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-4, 2); ctx.lineTo(0, 14 + Math.random() * 4); ctx.lineTo(4, 2);
+  ctx.stroke();
+}
+
+function drawShipCyber(ctx, skin) {
+  ctx.strokeStyle = skin.color; ctx.lineWidth = 2;
+  ctx.shadowBlur = 16; ctx.shadowColor = skin.glow;
+  ctx.beginPath();
+  ctx.moveTo(0, -20); ctx.lineTo(8, -6); ctx.lineTo(14, 10);
+  ctx.lineTo(0, 4); ctx.lineTo(-14, 10); ctx.lineTo(-8, -6);
+  ctx.closePath(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(0, 4); ctx.stroke();
+}
+
+let globalSpeedMultiplier = 1.0;
+let score = 0, level = 1, lives = 3, gameActive = false, transitioning = false;
+let enemies = [], laserLine = null, currentTarget = null;
+let wordsSpawnedInLevel = 0, wordsDestroyed = 0;
+let spawnTimer = null;
+let gameStartTime = 0;
+const ship = { x: 0, y: 0, angle: -Math.PI / 2 };
+let playerName = localStorage.getItem('km_player_name') || localStorage.getItem('playerName') || localStorage.getItem('uacss5_name') || '';
+let playerPin = localStorage.getItem('uac_player_pin') || '';
+let isMuted = localStorage.getItem('km_muted') === 'true';
+let recordCelebrated = false;
+let levelHits = 0, levelMisses = 0, levelEscaped = 0;
+let usedWordsThisLevel = new Set();
+let comboCount = 0;
+let bestCombo = 0;
+let comboMultiplier = 1;
+
+class Enemy {
+  constructor(word, type) {
+    this.word = word.toLocaleUpperCase('tr-TR');
+    this.remaining = this.word;
+    this.type = type;
+
+    const fontSize = Math.round(lW() * 0.033);
+    ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
+    const textWidth = ctx.measureText(this.word).width;
+    const padding = 20;
+
+    const maxAttempts = 12;
+    let x = padding;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const candidate = Math.random() * (lW() - textWidth - padding * 2) + padding;
+      const overlaps = enemies.some(en => {
+        const enFont = `bold ${Math.round(lW() * 0.033)}px 'Share Tech Mono', monospace`;
+        ctx.font = enFont;
+        const enW = ctx.measureText(en.word).width;
+        ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
+        return Math.abs(candidate - en.x) < Math.max(textWidth, enW) + 16;
+      });
+      x = candidate;
+      if (!overlaps) break;
+    }
+
+    this.x = Math.max(padding, Math.min(lW() - textWidth - padding, x));
+    this.y = -35;
+
+    const lengthFactor = Math.max(0.70, 1 - (this.word.length * 0.015));
+    const rawSpeed = Math.min(0.30 + (level * 0.03), 0.85);
+    this.baseSpeed = rawSpeed * lengthFactor * globalSpeedMultiplier;
+  }
+
+  update() { this.y += this.baseSpeed; }
+
+  draw() {
+    const isTarget = this === currentTarget;
+    const fontSize = Math.round(lW() * 0.033);
+    ctx.font = `bold ${fontSize}px 'Share Tech Mono', monospace`;
+
+    const dangerRatio = this.y / (lH() - 80);
+    const isDanger = dangerRatio > 0.70;
+
+    ctx.shadowBlur = isDanger ? 16 : 8;
+    ctx.shadowColor = isTarget ? '#ff00aa' : (isDanger ? '#ff4400' : '#00f5ff');
+
+    const typed = this.word.substring(0, this.word.length - this.remaining.length);
+    const rem = this.remaining;
+
+    ctx.fillStyle = '#335';
+    ctx.fillText(typed, this.x, this.y);
+
+    const tw = ctx.measureText(typed).width;
+    ctx.fillStyle = isTarget ? '#ff00aa' : (isDanger ? '#ff5500' : '#00f5ff');
+    ctx.fillText(rem, this.x + tw, this.y);
+
+    const totalW = ctx.measureText(this.word).width;
+    const prog = 1 - this.remaining.length / this.word.length;
+    ctx.fillStyle = 'rgba(255,0,170,0.12)';
+    ctx.fillRect(this.x, this.y + 3, totalW, 4);
+    ctx.fillStyle = isTarget ? '#ff00aa' : '#00f5ff';
+    ctx.fillRect(this.x, this.y + 3, totalW * prog, 4);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function spawnEnemy() {
+  if (!gameActive || transitioning) return;
+  if (wordsSpawnedInLevel >= 6) return;
+
+  const type = level <= 3 ? 'short' : (level <= 7 ? 'medium' : 'hard');
+  const pool = wordBank[type].words;
+  const available = pool.filter(w => !usedWordsThisLevel.has(w));
+  const wordPool = available.length > 0 ? available : pool;
+  const word = wordPool[Math.floor(Math.random() * wordPool.length)];
+  usedWordsThisLevel.add(word);
+
+  enemies.push(new Enemy(word, type));
+  wordsSpawnedInLevel++;
+
+  const delay = Math.max(1200, 3000 - level * 150);
+  if (wordsSpawnedInLevel < 6) spawnTimer = setTimeout(spawnEnemy, delay);
+}
+
+function handleInput(key) {
+  if (!gameActive || transitioning) return;
+  var char = key.toLocaleUpperCase('tr-TR');
+  var hitDetected = false;
+
+  if (!currentTarget) {
+    currentTarget = enemies.find(function(en) {
+      return en.remaining && en.remaining[0] && en.remaining[0].toLocaleUpperCase('tr-TR') === char;
+    });
+    if (currentTarget) {
+      safePlay(sounds.hit);
+      hitDetected = true;
+    }
+  }
+
+  if (currentTarget && currentTarget.remaining && currentTarget.remaining[0] && currentTarget.remaining[0].toLocaleUpperCase('tr-TR') === char) {
+    safePlay(sounds.laser);
+    hitDetected = true;
+
+    var fontSize = Math.round(lW() * 0.033);
+    ctx.font = "bold " + fontSize + "px 'Share Tech Mono', monospace";
+
+    laserLine = {
+      x1: ship.x,
+      y1: ship.y,
+      x2: currentTarget.x + ctx.measureText(currentTarget.word).width / 2,
+      y2: currentTarget.y,
+      life: 4
+    };
+
+    currentTarget.remaining = currentTarget.remaining.substring(1);
+
+    ship.angle = Math.atan2(currentTarget.y - ship.y, currentTarget.x - ship.x);
+
+    if (currentTarget.remaining.length === 0) {
+      safePlay(sounds.explosion);
+      var clr = wordBank[currentTarget.type].points >= 70 ? '#ff6600' : wordBank[currentTarget.type].points >= 30 ? '#ff00aa' : '#00f5ff';
+      spawnExplosion(currentTarget.x + 40, currentTarget.y, clr);
+
+      addCombo();
+      const basePoints = wordBank[currentTarget.type].points;
+      const gainedPoints = Math.round(basePoints * comboMultiplier);
+      score += gainedPoints;
+      wordsDestroyed++;
+      scoreEl.innerText = score;
+      updateBest();
+      if (comboMultiplier > 1) showNotif('+' + gainedPoints + ' PUAN x' + comboMultiplier.toFixed(1));
+
+      enemies.forEach(function(en) {
+        if (en !== currentTarget) en.y -= 15;
+      });
+
+      enemies = enemies.filter(function(en) { return en !== currentTarget; });
+      currentTarget = null;
+      checkLevelUp();
+    }
+  }
+
+  if (hitDetected) {
+  levelHits++;
+} else {
+  levelMisses++;
+  resetCombo('miss');
+}
+
+}
+
+function checkLevelUp() {
+  if (enemies.length === 0 && wordsSpawnedInLevel >= 6 && !transitioning && gameActive) {
+    transitioning = true;
+    gameActive = false;
+    level++;
+    levelEl.innerText = level;
+    showLevelTransition();
+  }
+}
+
+function showLevelTransition() {
+  const lt = document.getElementById('level-transition');
+  document.getElementById('lt-text').textContent = 'SEVİYE ' + level;
+  document.getElementById('lt-sub').textContent = level > 10 ? '⚠️ KRİTİK TEHDİT!' : (level > 6 ? '🔴 TEHLİKE ARTIYOR' : '✅ DEVAM ET!');
+  lt.classList.add('show');
+
+  let flashes = 0;
+  const intv = setInterval(() => {
+    lt.style.opacity = lt.style.opacity === '0' ? '1' : '0';
+    if (++flashes > 5) { clearInterval(intv); lt.style.opacity = '0'; lt.classList.remove('show'); }
+  }, 300);
+
+  setTimeout(() => {
+    transitioning = false;
+    gameActive = true;
+    wordsSpawnedInLevel = 0;
+    usedWordsThisLevel.clear();
+    spawnEnemy();
+  }, 2200);
+}
+
+function drawShip() {
+  ctx.save();
+  ctx.translate(ship.x, ship.y);
+  ctx.rotate(ship.angle + Math.PI / 2);
+  const skin = SKINS[selectedSkin];
+  skin.draw(ctx, skin);
+  ctx.restore();
+}
+
+let animId = null;
+function gameLoop() {
+  animId = requestAnimationFrame(gameLoop);
+
+  ctx.fillStyle = 'rgba(4,6,15,0.55)';
+  ctx.fillRect(0, 0, lW(), lH());
+  drawStars();
+
+  if (laserLine && laserLine.life > 0) {
+    const grad = ctx.createLinearGradient(laserLine.x1, laserLine.y1, laserLine.x2, laserLine.y2);
+    grad.addColorStop(0, '#ff00aa');
+    grad.addColorStop(1, '#00f5ff');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2 + laserLine.life * 0.5;
+    ctx.shadowBlur = 10; ctx.shadowColor = '#ff00aa';
+    ctx.beginPath();
+    ctx.moveTo(laserLine.x1, laserLine.y1);
+    ctx.lineTo(laserLine.x2, laserLine.y2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    laserLine.life--;
+  }
+
+  updateParticles();
+  drawShip();
+
+  if (gameActive) {
+    const snapshot = [...enemies];
+    snapshot.forEach(en => {
+      if (!enemies.includes(en)) return;
+      en.update();
+      en.draw();
+
+      if (en.y > lH() - 40) {
+        levelEscaped++;
+        resetCombo('escaped');
+        enemies = enemies.filter(e => e !== en);
+        if (en === currentTarget) currentTarget = null;
+        lives--;
+        updateLivesUI();
+        showNotif('💥 CAN KAYBEDİLDİ! ' + '❤️'.repeat(Math.max(0, lives)));
+        safePlay(sounds.explosion);
+        spawnExplosion(en.x + 30, lH() - 50, '#ff3344');
+
+        if (lives <= 0) gameOver();
+        else checkLevelUp();
+      }
+    });
+  }
+}
+
+function updateLivesUI() {
+  ['l1','l2','l3'].forEach((id, i) => {
+    document.getElementById(id).classList.toggle('lost', i >= lives);
+  });
+}
+
+let notifTO = null;
+function showNotif(txt) {
+  const n = document.getElementById('notif');
+  n.textContent = txt;
+  n.classList.add('show');
+  clearTimeout(notifTO);
+  notifTO = setTimeout(() => n.classList.remove('show'), 1600);
+}
+function getComboMultiplier(combo) {
+  if (combo >= 15) return 2.5;
+  if (combo >= 10) return 2.0;
+  if (combo >= 5) return 1.5;
+  if (combo >= 3) return 1.2;
+  return 1;
+}
+function updateComboDisplay(forceHide) {
+  const el = document.getElementById('combo-display');
+  if (!el) return;
+  comboMultiplier = getComboMultiplier(comboCount);
+  if (forceHide || comboCount < 3) {
+    el.classList.remove('show');
+    el.innerHTML = '<span>COMBO</span><strong>x1</strong>';
+    return;
+  }
+  el.innerHTML = '<span>' + comboCount + ' SERİ</span><strong>x' + comboMultiplier.toFixed(1) + '</strong>';
+  el.classList.add('show');
+}
+function addCombo() {
+  comboCount++;
+  bestCombo = Math.max(bestCombo, comboCount);
+  comboMultiplier = getComboMultiplier(comboCount);
+  updateComboDisplay(false);
+  if (comboCount === 3) showNotif('⚡ COMBO BAŞLADI');
+  else if (comboCount === 5) showNotif('🔥 COMBO x1.5');
+  else if (comboCount === 10) showNotif('🚀 COMBO x2');
+  else if (comboCount === 15) showNotif('👑 COMBO x2.5');
+}
+function resetCombo(reason) {
+  if (comboCount >= 5 && reason) showNotif('💥 COMBO BOZULDU');
+  comboCount = 0;
+  comboMultiplier = 1;
+  updateComboDisplay(true);
+}
+
+function updateBest() {
+  const b = parseInt(localStorage.getItem('km_best') || '0');
+  if (score > b) {
+    localStorage.setItem('km_best', score);
+    if (b > 0 && !recordCelebrated) {
+      recordCelebrated = true;
+      showNotif('🏆 YENİ REKOR!');
+      spawnExplosion(lW() / 2, lH() / 2, '#ffe600');
+    }
+  }
+  bestEl.innerText = Math.max(score, b);
+}
+
+async function submitScore() {
+  if (!playerName || score <= 0) return;
+  const duration = Math.floor((Date.now() - gameStartTime) / 1000);
+  try {
+    const res = await fetch(API_BASE + '/score-save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: playerName, player_pin: playerPin || '', score, level, duration, words: wordsDestroyed, session: gameSessionToken })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      if (data.code === 'banned') showNotif('🚫 ERİŞİMİNİZ ENGELLENDİ');
+      else if (data.code === 'cheat_detected') showNotif('⛔ GEÇERSİZ SKOR');
+    }
+  } catch (e) {}
+}
+
+async function fetchLeaderboard(period) {
+  try {
+    const res = await fetch(`${API_BASE}/leaderboard?period=${period}&limit=10`);
+    const data = await res.json();
+    return data.entries || [];
+  } catch (e) { return []; }
+}
+
+async function fetchProfile(name) {
+  try {
+    const res = await fetch(`${API_BASE}/profile?name=${encodeURIComponent(name)}`);
+    const data = await res.json();
+    return data;
+  } catch (e) { return null; }
+}
+
+async function buildScoreTable(myScore) {
+  const table = document.getElementById('score-table');
+  let localScores = [];
+  try { localScores = JSON.parse(localStorage.getItem('km_scores') || '[]'); } catch (e) {}
+  localScores.push({ name: playerName || 'MİSAFİR', score: myScore, ts: Date.now() });
+  localScores.sort((a, b) => b.score - a.score);
+  localScores = localScores.slice(0, 10);
+  localStorage.setItem('km_scores', JSON.stringify(localScores));
+
+  table.innerHTML = '<div style="color:#558;font-size:10px;letter-spacing:2px;text-align:center;margin:4px 0">YÜKLENİYOR...</div>';
+  const [lbAll, lbWeek, lbDay] = await Promise.all([fetchLeaderboard('all'), fetchLeaderboard('week'), fetchLeaderboard('day')]);
+  const profData = playerName ? await fetchProfile(playerName) : null;
+
+  let html = '';
+  if (profData && profData.found) {
+    const p = profData.profile;
+    html += `<div class="profile-box"><div class="pb-title">👤 ${escHtml(p.name)}</div><div class="pb-stats"><span>🏆 En İyi: <b>${p.best_score}</b></span><span>🎮 Oyun: <b>${p.total_games}</b></span><span>🔤 Kelime: <b>${p.total_words}</b></span><span>📊 Ort: <b>${profData.avg_score}</b></span></div><div class="pb-rank">${profData.rank_all ? `Tüm Zamanlar: <b>#${profData.rank_all}</b>` : ''}${profData.rank_week ? `&nbsp;|&nbsp; Bu Hafta: <b>#${profData.rank_week}</b>` : ''}</div></div>`;
+  }
+
+  html += `<div class="lb-tabs"><button class="lb-tab active" data-period="all">TÜM ZAMANLAR</button><button class="lb-tab" data-period="week">HAFTALIK</button><button class="lb-tab" data-period="day">GÜNLÜK</button></div><div class="lb-panel" id="lb-all">${renderLbList(lbAll, myScore)}</div><div class="lb-panel" id="lb-week" style="display:none">${renderLbList(lbWeek, myScore)}</div><div class="lb-panel" id="lb-day" style="display:none">${renderLbList(lbDay, myScore)}</div>`;
+
+  table.innerHTML = html;
+
+  table.querySelectorAll('.lb-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      table.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+      table.querySelectorAll('.lb-panel').forEach(p => p.style.display = 'none');
+      tab.classList.add('active');
+      table.querySelector('#lb-' + tab.dataset.period).style.display = '';
+    });
+  });
+}
+
+function renderLbList(entries, myScore) {
+  if (!entries.length) return '<div style="color:#446;padding:8px;text-align:center;">Henüz kayıt yok</div>';
+  return entries.map(e => {
+    const isMe = e.name === playerName;
+    return `<div class="score-row ${isMe ? 'you' : ''}"><span class="rank">#${e.rank}</span><span class="sname">${escHtml(e.name)}</span><span class="sval">${e.score}</span></div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+async function gameOver() {
+  if (!gameActive) return;
+  gameActive = false;
+  clearTimeout(spawnTimer);
+  const scoreToSave = score;
+  const savePromise = submitScore();
+  document.getElementById('final-score').textContent = scoreToSave;
+  const finalComboEl = document.getElementById('final-combo');
+  if (finalComboEl) finalComboEl.textContent = bestCombo;
+  const go = document.getElementById('z-game-over');
+  if (go) go.style.display = 'flex';
+  const table = document.getElementById('score-table');
+  if (table) table.innerHTML = '<div style="color:#558;font-size:10px;letter-spacing:2px;text-align:center;margin:4px 0">SKOR KAYDEDİLİYOR...</div>';
+  await savePromise;
+  await buildScoreTable(scoreToSave);
+}
+
+function resetGameState() {
+  score = 0; level = 1; lives = 3;
+  enemies = []; wordsSpawnedInLevel = 0;
+  wordsDestroyed = 0; transitioning = false;
+  levelHits = 0; levelMisses = 0; levelEscaped = 0;
+  comboCount = 0; bestCombo = 0; comboMultiplier = 1; updateComboDisplay(true);
+
+  recordCelebrated = false;
+  currentTarget = null;
+  laserLine = null;
+  usedWordsThisLevel.clear();
+  scoreEl.innerText = 0; levelEl.innerText = 1;
+  updateLivesUI(); updateBest();
+}
+
+function isMobileGameDevice() {
+  return window.matchMedia('(max-width: 768px)').matches || 'ontouchstart' in window;
+}
+
+function updateMobileViewportHeight() {
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty('--km-vvh', Math.max(320, Math.floor(h)) + 'px');
+}
+
+function enterMobilePlayMode() {
+  if (!isMobileGameDevice()) return;
+
+  updateMobileViewportHeight();
+  document.documentElement.classList.add('km-playing');
+  document.body.classList.add('km-playing');
+
+  setTimeout(() => {
+    updateMobileViewportHeight();
+    init();
+  }, 80);
+}
+
+function exitMobilePlayMode() {
+  document.documentElement.classList.remove('km-playing');
+  document.body.classList.remove('km-playing');
+
+  setTimeout(() => {
+    updateMobileViewportHeight();
+    init();
+  }, 80);
+}
+
+function focusMobileGameInput() {
+  if (!mobileInput) return;
+
+  updateMobileViewportHeight();
+
+  try {
+    mobileInput.focus({ preventScroll: true });
+  } catch (e) {
+    mobileInput.focus();
+  }
+
+  setTimeout(() => {
+    updateMobileViewportHeight();
+
+    if (document.body.classList.contains('km-playing')) {
+      init();
+    }
+  }, 120);
+}
+
+window.focusGameKeyboard = function () {
+  if (!gameActive) return;
+  enterMobilePlayMode();
+  focusMobileGameInput();
+};
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    updateMobileViewportHeight();
+
+    if (document.body.classList.contains('km-playing')) {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(init, 120);
+    }
+  });
+
+  window.visualViewport.addEventListener('scroll', () => {
+    updateMobileViewportHeight();
+  });
+}
+
+window.startGame = async function () {
+  Object.values(sounds).forEach(s => {
+    s.play().then(() => { s.pause(); s.currentTime = 0; }).catch(() => {});
+  });
+
+  document.getElementById('start-overlay').style.display = 'none';
+
+  resetGameState();
+  init();
+
+  gameActive = true;
+  gameStartTime = Date.now();
+
+  enterMobilePlayMode();
+  focusMobileGameInput();
+
+  gameSessionToken = await requestGameSession();
+
+  spawnEnemy();
+  sounds.bgm.play().catch(() => {});
+};
+
+window.restartGame = function () {
+  document.getElementById('z-game-over').style.display = 'none';
+  clearTimeout(spawnTimer);
+  window.startGame();
+};
+
+window.showStartScreen = function () {
+  document.getElementById('z-game-over').style.display = 'none';
+  document.getElementById('start-overlay').style.display = 'flex';
+  gameActive = false;
+  exitMobilePlayMode();
+};
+
+window.setPlayerName = async function () {
+  const input = document.getElementById('player-name-input');
+  const pinInput = document.getElementById('player-pin-input');
+  const name = (input?.value || '').trim();
+  const pin = (pinInput?.value || '').trim();
+  if (!name) { showNameError('İsim girin!'); return; }
+  if (name.length < 2 || name.length > 20) { showNameError('2-20 karakter olmalı'); return; }
+  if (!/^[a-zA-Z0-9_-]{4,12}$/.test(pin)) { showNameError('PIN 4-12 karakter olmalı. Harf/rakam kullan.'); return; }
+
+  const btn = document.getElementById('name-confirm-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+  try {
+    const res = await fetch(API_BASE + '/check-name', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, player_pin: pin })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      playerName = name;
+      playerPin = pin;
+      localStorage.setItem('uac_player_pin', pin);
+      localStorage.setItem('km_player_name', name);
+      localStorage.setItem('playerName', name);
+      localStorage.setItem('uacss5_name', name);
+      document.getElementById('name-step').style.display = 'none';
+      document.getElementById('ready-step').style.display = 'flex';
+      document.getElementById('display-name').textContent = name;
+    } else {
+      showNameError(data.message || 'Geçersiz isim');
+    }
+  } catch (e) {
+    showNameError('İsim/PIN kontrol edilemedi. İnternet bağlantını kontrol et.');
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'ONAYLA'; }
+};
+
+function showNameError(msg) {
+  const err = document.getElementById('name-error');
+  if (err) { err.textContent = msg; err.style.display = 'block'; }
+}
+
+window.skipName = function () {
+  playerName = '';
+  localStorage.removeItem('km_player_name');
+  document.getElementById('name-step').style.display = 'none';
+  document.getElementById('ready-step').style.display = 'flex';
+  document.getElementById('display-name').textContent = 'MİSAFİR';
+};
+
+window.changeName = function () {
+  document.getElementById('ready-step').style.display = 'none';
+  document.getElementById('name-step').style.display = 'flex';
+  localStorage.removeItem('km_player_name');
+  playerName = '';
+  const pinInput = document.getElementById('player-pin-input');
+  if (pinInput && playerPin) pinInput.value = playerPin;
+};
+
+window.toggleMute = function () {
+  isMuted = !isMuted;
+  localStorage.setItem('km_muted', isMuted);
+  Object.values(sounds).forEach(s => { s.muted = isMuted; });
+  const iconEl = document.getElementById('mute-icon');
+  if (iconEl) iconEl.innerText = isMuted ? '🔇' : '🔊';
+  const slider = document.getElementById('volume-slider');
+  if (slider) slider.value = isMuted ? 0 : (localStorage.getItem('km_volume') || 70);
+  if (isMuted) sounds.bgm.pause();
+  else if (gameActive) sounds.bgm.play().catch(() => {});
+};
+
+const volumeSlider = document.getElementById('volume-slider');
+if (volumeSlider) {
+  const savedVol = localStorage.getItem('km_volume') || '70';
+  volumeSlider.value = savedVol;
+  Object.values(sounds).forEach(s => { s.volume = savedVol / 100; });
+  volumeSlider.addEventListener('input', (e) => {
+    const vol = e.target.value / 100;
+    Object.values(sounds).forEach(s => { s.volume = vol; });
+    localStorage.setItem('km_volume', e.target.value);
+    if (vol === 0 && !isMuted) window.toggleMute();
+    if (vol > 0 && isMuted) window.toggleMute();
+  });
+}
+
+Object.values(sounds).forEach(s => { s.muted = isMuted; });
+
+function init() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = wrapper.clientWidth * dpr;
+  canvas.height = wrapper.clientHeight * dpr;
+  canvas.style.width = wrapper.clientWidth + 'px';
+  canvas.style.height = wrapper.clientHeight + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  ship.x = lW() / 2;
+  ship.y = lH() - 55;
+  initStars();
+
+  if (animId) cancelAnimationFrame(animId);
+  gameLoop();
+}
+
+let isComposing = false;
+
+mobileInput.addEventListener('compositionstart', () => { isComposing = true; });
+mobileInput.addEventListener('compositionend', e => {
+  isComposing = false;
+  const data = e.data || '';
+  for (const c of data) { if (c && c.trim()) handleInput(c); }
+  mobileInput.value = '';
+});
+
+mobileInput.addEventListener('input', e => {
+  if (isComposing) return;
+  const val = e.target.value;
+  if (val) {
+    for (const c of val) { if (c && c.trim()) handleInput(c); }
+  }
+  e.target.value = '';
+});
+
+window.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  if (e.key.length === 1) handleInput(e.key);
+});
+
+wrapper.addEventListener('click', () => {
+  if (gameActive) {
+    enterMobilePlayMode();
+    focusMobileGameInput();
+  }
+});
+
+wrapper.addEventListener('touchend', (e) => {
+  if (gameActive) {
+    e.preventDefault();
+    enterMobilePlayMode();
+    focusMobileGameInput();
+  }
+}, { passive: false });
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(init, 150);
+});
+
+bestEl.innerText = localStorage.getItem('km_best') || '0';
+init();
+
+const initialNameInput = document.getElementById('player-name-input');
+const initialPinInput = document.getElementById('player-pin-input');
+if (initialNameInput && playerName) initialNameInput.value = playerName;
+if (initialPinInput && playerPin) initialPinInput.value = playerPin;
+
+if (playerName && playerPin) {
+  const nameStep = document.getElementById('name-step');
+  const readyStep = document.getElementById('ready-step');
+  const dispName = document.getElementById('display-name');
+  if (nameStep && readyStep && dispName) {
+    nameStep.style.display = 'none';
+    readyStep.style.display = 'flex';
+    dispName.textContent = playerName;
+  }
+}
+})();

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Günün Sırrı - UltiAtomCore</title>
+  <meta name="description" content="Her gün yeni bilmece: cevabı bul, serini koru.">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="stylesheet" href="assets/css/uac.css">
+  <link rel="stylesheet" href="assets/css/site.css">
+
+</head>
+<body class="uac-site page-gunun-sirri">
+  <header class="site-header">
+    <a class="site-brand" href="index.html"><img src="assets/img/logo.png" alt="ultiatomcore logo" width="50" height="50"><span>ultiatomcore</span></a>
+    <button class="site-nav-toggle" type="button" aria-label="Menü" aria-expanded="false">☰</button>
+    <nav class="site-nav" aria-label="Ana menü">
+        <a href="password-challenge.html">Password Challenge</a>
+        <a href="klavye-muharebesi.html">Klavye Muharebesi</a>
+        <a href="son-siginak.html">Son Sığınak</a>
+        <a href="gunun-sirri.html" aria-current="page" class="is-active">Günün Sırrı</a>
+        <a href="sifre-olusturucu.html">Şifre Oluşturucu</a>
+        <a href="profilim.html">Profilim</a>
+        <a href="sohbet.html">Sohbet</a>
+    </nav>
+  </header>
+  <main class="site-main">
+<section class="uac-page uac-daily-page uac-secret-page" aria-labelledby="uac-daily-title">
+  <div class="uac-daily-stage">
+    <canvas id="uac-daily-canvas" aria-hidden="true"></canvas>
+
+    <div class="uac-daily-copy">
+      <p class="uac-eyebrow">Günlük bilmece</p>
+      <h1 id="uac-daily-title">Günün Sırrı</h1>
+      <p class="uac-subtitle">Oyuncu adını yaz, sırrı getir ve cevabı dene. Her gün 03:00 sonrası yeni soru açılır; doğru cevap serini ve profil puanını yükseltir.</p>
+      <div class="uac-hero-badges">
+        <span class="uac-pill">🧩 7 günlük paket</span>
+        <span class="uac-pill">🧠 Bilmece</span>
+        <span class="uac-pill">🔥 Seri koruma</span>
+        <span class="uac-pill">🎧 Ses efekti</span>
+      </div>
+    </div>
+
+    <div class="uac-daily-console">
+      <label class="uac-input-label" for="uacDailyName">Oyuncu adı</label>
+      <input id="uacDailyName" class="uac-daily-input" maxlength="20" placeholder="Oyuncu adın" autocomplete="off" spellcheck="false">
+      <label class="uac-input-label" for="uacDailyPin">Oyuncu PIN</label>
+      <input id="uacDailyPin" class="uac-daily-input uac-player-pin-input" type="password" maxlength="12" placeholder="PIN (4-12 karakter)" autocomplete="off" spellcheck="false">
+      <p class="uac-pin-note">Aynı oyuncu adını başka cihazda kullanmak için bu PIN gerekir.</p>
+
+      <div class="uac-daily-meter" title="Paket ilerlemesi"><i id="uacDailyMeter"></i></div>
+
+      <div class="uac-secret-meta">
+        <span id="uacSecretPack">Paket yükleniyor</span>
+        <span id="uacSecretDay">Gün -</span>
+      </div>
+
+      <p class="uac-eyebrow" id="uacDailyTheme">Soru yükleniyor</p>
+      <div id="uacDailySymbol" class="uac-secret-symbol">◆</div>
+      <div id="uacDailyQuestion" class="uac-daily-question">Hazırlanıyor...</div>
+      <p id="uacDailyLore" class="uac-secret-lore">Sır parçası yükleniyor...</p>
+      <p id="uacDailyHint" class="uac-empty-note">İpucu cevaba yaklaştırır ama puanını düşürür.</p>
+
+      <div class="uac-form-row">
+        <input id="uacDailyAnswer" class="uac-daily-input" maxlength="80" placeholder="Cevabını yaz..." autocomplete="off" spellcheck="false">
+        <button id="uacDailySend" class="uac-btn uac-btn-primary" type="button">Cevapla</button>
+      </div>
+      <div class="uac-form-row">
+        <button id="uacDailyLoad" class="uac-btn" type="button">Sırrı Getir</button>
+        <button id="uacDailyHintBtn" class="uac-btn" type="button">İpucu Al</button>
+        <button id="uacDailySound" class="uac-btn" type="button">Ses: Açık</button>
+      </div>
+      <div id="uacDailyStatus" class="uac-daily-status">Oyuncu adını yaz ve sırrı getir.</div>
+    </div>
+  </div>
+
+  <section class="uac-section uac-readable" aria-labelledby="daily-how-title">
+    <h2 id="daily-how-title">Günün Sırrı nasıl çalışır?</h2>
+    <p>Günün Sırrı, her gün kısa bir bilmece çözmen için tasarlanmış günlük görev oyunudur. Oyuncu adını yazıp “Sırrı Getir” butonuna bastığında o günün sorusu, tema bilgisi, paket ilerlemesi ve varsa ipucu alanı açılır. Doğru cevap verdiğinde puanın artar, günlük seri bilgin güncellenir ve profil sayfanda görünür.</p>
+    <p>Bu oyun tek seferlik hızlı bir bilmece değil, düzenli geri dönüş mantığıyla çalışır. Her gün yeni soru açılması, oyuncuların seri korumasını ve kendi puan gelişimini takip etmesini sağlar. İpucu almak cevaba yaklaşmayı kolaylaştırır; fakat oyunun mantığı gereği ipucu kullanımı puan kazancını azaltabilir.</p>
+  </section>
+
+  <section class="uac-platform-grid uac-secret-bottom" style="margin-top:22px">
+    <div class="uac-platform-card">
+      <h2>Günlük profil</h2>
+      <div class="uac-stat-grid">
+        <div class="uac-stat"><span>Puan</span><b id="uacDailyScore">0</b></div>
+        <div class="uac-stat"><span>Seri</span><b id="uacDailyStreak">0</b></div>
+        <div class="uac-stat"><span>Çözülen</span><b id="uacDailyAnswered">0</b></div>
+      </div>
+      <p class="uac-empty-note" id="uacSecretLibraryInfo">Kütüphane durumu yüklenmedi.</p>
+    </div>
+    <div class="uac-platform-card">
+      <h2>Sıralama</h2>
+      <div id="uacDailyBoard" class="uac-board-list"><p class="uac-empty-note">Henüz yüklenmedi.</p></div>
+    </div>
+  </section>
+
+  <section class="uac-section uac-readable" aria-labelledby="daily-tips-title">
+    <h2 id="daily-tips-title">Cevap verirken dikkat edilecekler</h2>
+    <ul class="uac-feature-list">
+      <li>Cevabı kısa ve net yaz. Bilmece tek kelime veya kısa bir ifade istiyor olabilir.</li>
+      <li>Türkçe karakter kullanman gerekebilir; ancak bazı cevaplarda sistem yakın yazımları da anlayabilir.</li>
+      <li>İpucunu son çare olarak kullan. Önce sorunun temasına, sembolüne ve verilen küçük hikaye parçasına bak.</li>
+      <li>Her gün aynı oyuncu adı ve PIN kodunu kullanırsan seri ve puanın profilinde daha düzenli görünür.</li>
+    </ul>
+  </section>
+
+  <section class="uac-section uac-readable" aria-labelledby="daily-faq-title">
+    <h2 id="daily-faq-title">Sık sorulan sorular</h2>
+    <p><strong>Soru ne zaman yenilenir?</strong> Günlük sistem 03:00 sonrası yeni soru mantığıyla çalışır. Aynı gün içinde doğru cevap verdiysen yeni soru için ertesi günü beklemen gerekir.</p>
+    <p><strong>İpucu almak kötü mü?</strong> Hayır. İpucu oyunu kilitlendiğinde yardımcı olur. Sadece puan sistemi, ipucusuz çözümü daha değerli sayar.</p>
+    <p><strong>Profil puanı nerede görünür?</strong> Aynı oyuncu adıyla oynarsan puan, seri ve çözülen soru bilgileri profil sayfasında ve ilgili sıralama alanlarında görünebilir.</p>
+  </section>
+</section>
+  </main>
+  <footer class="site-footer">
+    <nav aria-label="Site bilgileri">
+      <a href="hakkimizda.html">Hakkımızda</a>
+      <a href="gizlilik-politikasi.html">Gizlilik Politikası</a>
+      <a href="kullanim-sartlari.html">Kullanım Şartları</a>
+      <a href="cerez-politikasi.html">Çerez Politikası</a>
+      <a href="iletisim.html">İletişim</a>
+    </nav>
+    <p>© UltiAtomCore</p>
+  </footer>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/local-api/core.js"></script>
+  <script src="assets/js/local-api/daily-library.js"></script>
+  <script src="assets/js/local-api/klavye-son-siginak.js"></script>
+  <script src="assets/js/local-api/daily-secret.js"></script>
+  <script src="assets/js/local-api/chat-password-platform.js"></script>
+  <script src="assets/js/pages/gunun-sirri.js"></script>
+</body>
+</html>

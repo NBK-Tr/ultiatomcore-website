@@ -1,0 +1,6 @@
+<section class="uac-page uac-readable" aria-labelledby="terms-title">
+  <header class="uac-hero uac-hero-small"><p class="uac-eyebrow">Kurallar</p><h1 id="terms-title">Kullanım Şartları</h1><p class="uac-subtitle">UltiAtomCore'u kullanan herkes temiz oyun, güvenli sohbet ve adil skor kurallarına uymayı kabul eder.</p></header>
+  <section class="uac-section"><h2>Genel kullanım</h2><p>Site oyun, skor, profil ve sohbet özellikleri sunar. Oyunları adil şekilde oynamak, sistemleri bozacak otomatik araçlar kullanmamak ve diğer kullanıcıları rahatsız etmemek gerekir.</p></section>
+  <section class="uac-section"><h2>Sohbet kuralları</h2><ul class="uac-feature-list"><li>Hakaret, spam, reklam, link ve uygunsuz içerik paylaşılmamalıdır.</li><li>Gerçek adres, telefon, okul bilgisi, hesap şifresi veya özel kimlik bilgisi yazılmamalıdır.</li><li>Başka kullanıcıyı taklit eden veya yönetici izlenimi veren adlar kullanılmamalıdır.</li><li>Kurallara aykırı mesajlar silinebilir ve kötüye kullanım engellenebilir.</li></ul></section>
+  <section class="uac-section"><h2>Skor ve profil</h2><p>Şüpheli skorlar, otomatik istekler veya hile denemeleri sistemden kaldırılabilir. Oyuncu adı ve PIN, profilin düzenli görünmesi için kullanılır; gerçek hesap şifresi yerine geçmez.</p></section>
+</section>

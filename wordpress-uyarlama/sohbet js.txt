@@ -1,0 +1,397 @@
+(function () {
+  'use strict';
+
+  const chatBox = document.getElementById('chatBox');
+  const chatNameInput = document.getElementById('chatName');
+  const chatMessage = document.getElementById('chatMessage');
+  const chatPinInput = document.getElementById('chatPin');
+  const chatWebsite = document.getElementById('chatWebsite');
+  const sendChat = document.getElementById('sendChat');
+  const onlineCountEl = document.getElementById('onlineCount');
+  const chatNotice = document.getElementById('chatNotice');
+  const chatWrapper = document.getElementById('chatWrapper');
+  const chatGateBox = document.getElementById('chatGateBox');
+
+  if (!chatBox || !chatMessage || !sendChat) return;
+
+  const pageStartedAt = Date.now();
+  let lastSendTime = Number(localStorage.getItem('uac_chat_last_send') || '0');
+  let lastMessage = localStorage.getItem('uac_chat_last_message') || '';
+  let noticeTimer = null;
+  if (sessionStorage.getItem('uac_admin_token')) window.UAC_IS_ADMIN = true;
+  let canSendChat = !!window.UAC_IS_ADMIN;
+  let lastGateName = '';
+  let lastGatePin = '';
+  let gateChecking = false;
+  let adminMode = false;
+  let adminPanel = null;
+  let adminList = null;
+  let adminRefresh = null;
+  let adminClear = null;
+
+  const SHORT_ALLOW = new Set([
+    'as','sa','slm','mrb','mrh','ii','iyi','ok','oki','tm','tmm','gg','wp','xd','lol','brb','afk','np','ty','thx','hi','hey','yo','no','yes','gl','hf','ez','wb','gm','gn','bb','by','js','php','css','html','sql','api','fps','lag','bug','fix','mod','bot','ai','pc','dc','yt','ig','wp','hmm','hm','tsk'
+  ]);
+
+  function showChatNotice(text) {
+    if (!chatNotice) { alert(text); return; }
+    chatNotice.textContent = text;
+    chatNotice.classList.add('show');
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => chatNotice.classList.remove('show'), 3000);
+  }
+
+  function setChatGate(allowed, message, source) {
+    canSendChat = !!allowed || !!window.UAC_IS_ADMIN;
+    if (chatGateBox) {
+      chatGateBox.classList.toggle('unlocked', canSendChat);
+      const srcText = source ? ' Açan oyun: ' + source.replace(/_/g, ' ') + '.' : '';
+      chatGateBox.innerHTML = canSendChat
+        ? `<strong>Sohbet açık:</strong> Bu oyuncu adıyla oyun kaydı bulundu.${esc(srcText)}`
+        : `<strong>Yazma kilidi:</strong> ${esc(message || 'Sohbete yazmak için önce aynı oyuncu adı ve PIN ile herhangi bir oyunu tamamla.')}
+           <div class="uac-chat-gate-links"><a href="/klavye-muharebesi/">Klavye Muharebesi</a><a href="/password-challenge/">Password Challenge</a><a href="/gunun-sirri/">Günün Sırrı</a></div>`;
+    }
+    if (chatMessage) {
+      chatMessage.disabled = !canSendChat;
+      chatMessage.placeholder = canSendChat ? 'Mesaj yaz...' : 'Önce oyun + PIN gerekli...';
+    }
+    if (sendChat) sendChat.disabled = !canSendChat;
+  }
+
+  async function checkChatGate(name, quiet = false) {
+    name = String(name || '').trim().slice(0, 20);
+    if (window.UAC_IS_ADMIN) { setChatGate(true, 'Admin'); return true; }
+    if (!name) {
+      setChatGate(false, 'Önce oyuncu adını yaz; sonra oyun kaydı kontrol edilecek.');
+      return false;
+    }
+    const pin = getPlayerPin();
+    if (!validPin(pin)) {
+      setChatGate(false, '4-12 karakterlik oyuncu PIN gir. Aynı PIN başka cihazda devam etmek için gerekir.');
+      return false;
+    }
+    if (gateChecking) return canSendChat;
+    if (lastGateName === name && lastGatePin === pin && canSendChat) return true;
+    gateChecking = true;
+    try {
+      const res = await fetch(`/wp-json/password-game/v1/chat-status?name=${encodeURIComponent(name)}&player_pin=${encodeURIComponent(pin)}&device_key=${encodeURIComponent(getDeviceKey())}`, { credentials: 'same-origin', cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      lastGateName = name;
+      lastGatePin = pin;
+      setChatGate(!!data.can_chat, data.message, data.source);
+      if (!data.can_chat && !quiet) showChatNotice(data.message || 'Sohbete yazmak için önce aynı oyuncu adı ve PIN ile herhangi bir oyunu tamamla.');
+      return !!data.can_chat;
+    } catch (e) {
+      setChatGate(false, 'Oyun kaydı kontrol edilemedi. Sayfayı yenileyip tekrar dene.');
+      if (!quiet) showChatNotice('Oyun kaydı kontrol edilemedi.' );
+      return false;
+    } finally {
+      gateChecking = false;
+    }
+  }
+
+  function hasLink(text) {
+    return /(https?:\/\/|www\.|\.com|\.net|\.org|\.xyz|\.io|\.gg|\.tr|discord\.gg|t\.me)/i.test(text);
+  }
+
+  function esc(text) {
+    return String(text ?? '').replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));
+  }
+
+  function normalizeText(text) {
+    return String(text || '')
+      .toLocaleLowerCase('tr-TR')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c')
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  function normalizeMsg(text) {
+    return String(text || '').toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ').trim();
+  }
+
+  function isProbablyNoise(text) {
+    const compact = normalizeText(text);
+    if (!compact) return false;
+    if (SHORT_ALLOW.has(compact)) return false;
+    if (compact.length === 1) return true;
+    if (compact.length <= 2) return true;
+    if (/^(.)\1{2,}$/.test(compact)) return true;
+    if (/^(.{1,2})\1{2,}$/.test(compact)) return true;
+    if (!/[aeiou]/.test(compact) && compact.length <= 6) return true;
+    if (/^(asdf|sdfg|dfgh|fghj|qwer|wert|zxcv|xcvb|cvbn|hjkl)/.test(compact)) return true;
+    return false;
+  }
+
+  function getDeviceKey() {
+    let key = localStorage.getItem('uac_chat_device_key') || '';
+    if (!key) {
+      key = (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+      localStorage.setItem('uac_chat_device_key', key);
+    }
+    return key;
+  }
+
+  function getPlayerPin() {
+    let pin = chatPinInput && chatPinInput.value.trim() ? chatPinInput.value.trim() : (localStorage.getItem('uac_player_pin') || '');
+    if (chatPinInput && !chatPinInput.value && pin) chatPinInput.value = pin;
+    return pin;
+  }
+
+  function validPin(pin) { return /^[a-zA-Z0-9_-]{4,12}$/.test(String(pin || '')); }
+
+  function savePlayerPin(pin) { if (validPin(pin)) localStorage.setItem('uac_player_pin', pin); }
+
+  function getPlayerName() {
+    let name = '';
+    if (chatNameInput && chatNameInput.value.trim()) name = chatNameInput.value.trim();
+    else name = localStorage.getItem('km_player_name') || localStorage.getItem('playerName') || localStorage.getItem('uacss5_name') || '';
+    if (!name) {
+      name = prompt('Sohbete katılmak için bir isim girin:');
+      if (!name || !name.trim()) return '';
+      name = name.trim();
+    }
+    name = name.slice(0, 20);
+    localStorage.setItem('playerName', name);
+    localStorage.setItem('km_player_name', name);
+    localStorage.setItem('uacss5_name', name);
+    if (chatNameInput && !chatNameInput.value) chatNameInput.value = name;
+    return name;
+  }
+
+  function getColor(name) {
+    const colors = ['#00ffcc', '#ffcc00', '#ff66ff', '#66ccff', '#ff6666'];
+    let sum = 0;
+    for (let i = 0; i < String(name).length; i++) sum += String(name).charCodeAt(i);
+    return colors[sum % colors.length];
+  }
+
+  function getChatBadge(item) {
+    const badges = [];
+    if (item.is_admin) badges.push('👑 [KURUCU]');
+    const best = Number(item.km_best_score || 0);
+    const rankWeek = item.km_rank_week ? Number(item.km_rank_week) : null;
+    if (rankWeek && rankWeek <= 3) badges.push('👑 #' + rankWeek);
+    else if (rankWeek && rankWeek <= 10) badges.push('🔥 #' + rankWeek);
+    else if (best > 0) badges.push('🏆 ' + best);
+    return badges.length ? ' ' + badges.join(' ') : '';
+  }
+
+  function appendMessage(item) {
+    const div = document.createElement('div');
+    div.className = 'chatItem';
+    div.dataset.id = item.id || '';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'chatName';
+    nameEl.style.color = getColor(item.name || 'Anonim');
+    nameEl.textContent = (item.name || 'Anonim') + getChatBadge(item);
+
+    const msgEl = document.createElement('div');
+    msgEl.className = 'chatMsg';
+    msgEl.textContent = item.message || '';
+
+    const meta = document.createElement('div');
+    meta.className = 'chatMeta';
+    meta.innerHTML = `<span>${esc(item.time || '')}</span><span>${item.id ? '#' + esc(item.id) : ''}</span>`;
+
+    div.appendChild(nameEl);
+    div.appendChild(msgEl);
+    div.appendChild(meta);
+
+    if (adminMode && item.id) {
+      const actions = document.createElement('div');
+      actions.className = 'uac-chat-admin-actions';
+      actions.innerHTML = `<button type="button" data-del="${esc(item.id)}">Sil</button><button type="button" data-ban="${esc(item.name || '')}">İsmi engelle</button>`;
+      div.appendChild(actions);
+    }
+
+    chatBox.appendChild(div);
+  }
+
+  async function loadChat() {
+    try {
+      const name = localStorage.getItem('km_player_name') || localStorage.getItem('playerName') || localStorage.getItem('uacss5_name') || '';
+      const res = await fetch(`/wp-json/password-game/v1/chat-list?user=${encodeURIComponent(name)}`, { credentials: 'same-origin', cache: 'no-store' });
+      const data = await res.json();
+      chatBox.innerHTML = '';
+      const messages = Array.isArray(data) ? data : (data.messages || []);
+      if (!messages.length) {
+        chatBox.innerHTML = '<p class="uac-empty-note">Henüz mesaj yok. İlk oyun yorumunu sen bırak.</p>';
+      } else {
+        messages.forEach(appendMessage);
+      }
+      if (onlineCountEl && data.online_count !== undefined) onlineCountEl.textContent = Number(data.online_count || 0) + ' online';
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (error) {
+      if (!chatBox.children.length) chatBox.innerHTML = '<p class="uac-empty-note">Sohbet şu an yüklenemedi.</p>';
+    }
+  }
+
+  async function sendMessage() {
+    const name = getPlayerName();
+    if (!name) return;
+    const pin = getPlayerPin();
+    if (!validPin(pin)) return showChatNotice('PIN 4-12 karakter olmalı.');
+    const allowed = await checkChatGate(name, false);
+    if (!allowed) return;
+
+    const message = chatMessage.value.trim().replace(/\s+/g, ' ');
+    if (!message) return showChatNotice('Boş mesaj gönderemezsin.');
+    if (message.length > 120) return showChatNotice('Mesaj en fazla 120 karakter olabilir.');
+    if (hasLink(message)) return showChatNotice('Sohbette link paylaşımı kapalı.');
+
+    const normalized = normalizeMsg(message);
+    if (normalized === normalizeMsg(lastMessage)) return showChatNotice('Aynı mesajı üst üste gönderemezsin.');
+    if (isProbablyNoise(message) && !SHORT_ALLOW.has(normalizeText(message))) return showChatNotice('Mesaj rastgele harf gibi görünüyor. Biraz daha anlaşılır yaz.');
+
+    const now = Date.now();
+    const wait = 3000 - (now - lastSendTime);
+    if (wait > 0) return showChatNotice('Yeni mesaj için ' + Math.ceil(wait / 1000) + ' saniye bekle.');
+
+    sendChat.disabled = true;
+    try {
+      const res = await fetch('/wp-json/password-game/v1/chat-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          name,
+          message,
+          website: chatWebsite ? chatWebsite.value : '',
+          device_key: getDeviceKey(),
+          player_pin: pin,
+          page_age: Math.floor((Date.now() - pageStartedAt) / 1000)
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.message || 'Mesaj gönderilemedi.');
+      chatMessage.value = '';
+      lastSendTime = Date.now();
+      lastMessage = message;
+      localStorage.setItem('uac_chat_last_send', String(lastSendTime));
+      localStorage.setItem('uac_chat_last_message', message);
+      savePlayerPin(pin);
+      await loadChat();
+    } catch (error) {
+      showChatNotice(error.message || 'Mesaj gönderilemedi.');
+    } finally {
+      sendChat.disabled = false;
+    }
+  }
+
+  function restHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (window.UAC_REST_NONCE) h['X-WP-Nonce'] = window.UAC_REST_NONCE;
+    const adminTok = sessionStorage.getItem('uac_admin_token') || '';
+    if (adminTok) h['X-UAC-Admin-Token'] = adminTok;
+    return h;
+  }
+
+  async function adminPost(path, body) {
+    const res = await fetch('/wp-json/password-game/v1/' + path, {
+      method: 'POST', headers: restHeaders(), credentials: 'same-origin', body: JSON.stringify(body || {})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) throw new Error(data.message || 'Admin işlemi başarısız.');
+    return data;
+  }
+
+  function ensureAdminPanel() {
+    if (!window.UAC_IS_ADMIN || adminPanel) return;
+    adminPanel = document.createElement('section');
+    adminPanel.id = 'chatAdminPanel';
+    adminPanel.className = 'uac-admin-panel';
+    adminPanel.setAttribute('aria-label', 'Sohbet admin kontrol paneli');
+    adminPanel.innerHTML = `
+      <h2>Admin kontrol</h2>
+      <p>Bu panel sadece yönetici oturumunda tarayıcıya eklenir. Mesaj silebilir, ismi engelleyebilir veya sohbeti temizleyebilirsin.</p>
+      <div class="uac-form-row">
+        <button class="uac-btn" id="chatAdminRefresh" type="button">Admin listesini yenile</button>
+        <button class="uac-btn" id="chatAdminClear" type="button">Sohbeti temizle</button>
+      </div>
+      <div id="chatAdminList"></div>
+    `;
+    if (chatWrapper && chatWrapper.parentNode) chatWrapper.parentNode.insertBefore(adminPanel, chatWrapper.nextSibling);
+    adminList = adminPanel.querySelector('#chatAdminList');
+    adminRefresh = adminPanel.querySelector('#chatAdminRefresh');
+    adminClear = adminPanel.querySelector('#chatAdminClear');
+    if (adminRefresh) adminRefresh.addEventListener('click', loadAdminList);
+    if (adminClear) adminClear.addEventListener('click', async () => {
+      if (!confirm('Tüm sohbet mesajları silinsin mi?')) return;
+      try { await adminPost('chat-clear', {}); await loadAdminList(); await loadChat(); } catch (e) { showChatNotice(e.message); }
+    });
+  }
+
+  async function loadAdminList() {
+    if (!window.UAC_IS_ADMIN) return;
+    ensureAdminPanel();
+    if (!adminPanel || !adminList) return;
+    try {
+      const res = await fetch('/wp-json/password-game/v1/chat-admin-list?limit=80', {
+        headers: restHeaders(),
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.ok) return;
+      adminMode = true;
+      adminPanel.classList.add('show');
+      adminList.innerHTML = (data.items || []).map(item => `
+        <div class="uac-admin-row">
+          <div><b>${esc(item.name)}</b>: ${esc(item.message)}<small>${esc(item.date)} · #${esc(item.id)}</small></div>
+          <div><button type="button" data-admin-del="${esc(item.id)}">Sil</button><button type="button" data-admin-ban="${esc(item.name)}">İsmi engelle</button></div>
+        </div>
+      `).join('') || '<p class="uac-empty-note">Mesaj yok.</p>';
+      await loadChat();
+    } catch (e) {}
+  }
+
+  document.addEventListener('click', async (e) => {
+    const del = e.target?.dataset?.del || e.target?.dataset?.adminDel;
+    const ban = e.target?.dataset?.ban || e.target?.dataset?.adminBan;
+    try {
+      if (del) {
+        if (!confirm('Mesaj silinsin mi?')) return;
+        await adminPost('chat-delete', { id: del });
+        await loadAdminList();
+        await loadChat();
+      }
+      if (ban) {
+        if (!confirm(ban + ' ismi engellensin mi?')) return;
+        await adminPost('chat-ban-name', { name: ban });
+        await loadAdminList();
+      }
+    } catch (err) {
+      showChatNotice(err.message);
+    }
+  });
+
+  sendChat.addEventListener('click', sendMessage);
+  chatMessage.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+  if (chatNameInput && !chatNameInput.value) chatNameInput.value = localStorage.getItem('playerName') || localStorage.getItem('km_player_name') || localStorage.getItem('uacss5_name') || '';
+  if (chatPinInput && !chatPinInput.value) chatPinInput.value = localStorage.getItem('uac_player_pin') || '';
+  if (chatNameInput) {
+    let gateInputTimer = null;
+    checkChatGate(chatNameInput.value, true);
+    chatNameInput.addEventListener('input', () => {
+      clearTimeout(gateInputTimer);
+      gateInputTimer = setTimeout(() => checkChatGate(chatNameInput.value, true), 450);
+    });
+    chatNameInput.addEventListener('change', () => checkChatGate(chatNameInput.value, true));
+    chatNameInput.addEventListener('blur', () => checkChatGate(chatNameInput.value, true));
+    if (chatPinInput) {
+      chatPinInput.addEventListener('input', () => { clearTimeout(gateInputTimer); gateInputTimer = setTimeout(() => checkChatGate(chatNameInput.value, true), 450); });
+      chatPinInput.addEventListener('change', () => checkChatGate(chatNameInput.value, true));
+      chatPinInput.addEventListener('blur', () => checkChatGate(chatNameInput.value, true));
+    }
+  } else {
+    checkChatGate(localStorage.getItem('km_player_name') || localStorage.getItem('playerName') || localStorage.getItem('uacss5_name') || '', true);
+  }
+  loadChat();
+  loadAdminList();
+  setInterval(loadChat, 8000);
+})();

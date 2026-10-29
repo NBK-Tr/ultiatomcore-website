@@ -1,0 +1,50 @@
+<section class="uac-page uac-profile-page" aria-labelledby="uac-profile-title">
+  <header class="uac-hero uac-hero-small">
+    <p class="uac-eyebrow">Oyuncu merkezi</p>
+    <h1 id="uac-profile-title">Profil</h1>
+    <p class="uac-subtitle">Klavye Muharebesi, Günün Sırrı ve varsa Son Sığınak verilerini tek yerde gör. Aynı oyuncu adı ve PIN kodunu kullandıkça skor geçmişin daha düzenli görünür.</p>
+  </header>
+
+  <section class="uac-section uac-readable" aria-labelledby="profile-info-title">
+    <h2 id="profile-info-title">Profil sayfası ne işe yarar?</h2>
+    <p>UltiAtomCore profil sayfası, farklı oyunlarda aynı oyuncu adıyla oluşan ilerlemeyi tek ekranda toplar. Klavye Muharebesi skorların, Günün Sırrı puanın, günlük seri bilgin ve varsa Son Sığınak başarımların bu sayfadan kontrol edilebilir. Bu sistem hesap açma zorunluluğu yerine oyuncu adı + PIN mantığıyla çalışır.</p>
+    <p>Profilin doğru görünmesi ve başkasının adını kullanamaması için oyunlarda aynı adı ve aynı PIN kodunu kullanman gerekir. Farklı yazılan adlar ayrı oyuncu gibi algılanır. Örneğin bir gün “Naci”, başka gün “naci123” yazarsan sistem bunları farklı profil olarak gösterebilir.</p>
+  </section>
+
+  <section class="uac-profile-hero">
+    <div class="uac-profile-search">
+      <div class="uac-profile-avatar">👤</div>
+      <h2>Oyuncu ara</h2>
+      <p>Oyunda kullandığın adı yaz. Aynı ismi kullandıkça profil büyür.</p>
+      <div class="uac-form-row">
+        <input id="uacProfileName" class="uac-profile-input" maxlength="20" placeholder="Oyuncu adın" autocomplete="off" spellcheck="false">
+        <button id="uacProfileLoad" class="uac-btn uac-btn-primary" type="button">Profili Aç</button>
+      </div>
+      <p class="uac-empty-note">Son Sığınak profilinde cihaz kimliği kullanıldığı için aynı tarayıcıdan girince daha doğru görünür.</p>
+    </div>
+
+    <div class="uac-profile-search">
+      <p class="uac-eyebrow">Özet</p>
+      <div id="uacProfileNameTitle" class="uac-profile-name">Oyuncu</div>
+      <div class="uac-stat-grid">
+        <div class="uac-stat"><span>En iyi skor</span><b id="uacProfileBest">0</b></div>
+        <div class="uac-stat"><span>Toplam oyun</span><b id="uacProfileGames">0</b></div>
+        <div class="uac-stat"><span>Günlük seri</span><b id="uacProfileStreak">0</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="uacProfileResult" class="uac-profile-result">
+    <p class="uac-empty-note">Profil yüklemek için isim yaz.</p>
+  </section>
+
+  <section class="uac-section uac-readable" aria-labelledby="profile-data-title">
+    <h2 id="profile-data-title">Hangi bilgiler görünür?</h2>
+    <ul class="uac-feature-list">
+      <li><strong>Klavye Muharebesi:</strong> en iyi skor, en iyi seviye, toplam oyun, toplam kelime ve sıralama bilgileri.</li>
+      <li><strong>Günün Sırrı:</strong> toplam puan, çözülen soru sayısı, günlük seri ve en iyi seri bilgisi.</li>
+      <li><strong>Son Sığınak:</strong> aynı tarayıcıdan oynandıysa en iyi skor, oyun sayısı, boss ve başarım bilgileri.</li>
+    </ul>
+    <p>Bu bilgiler oyuncuya ilerlemesini takip etme imkanı verir. Profil sistemi gerçek ad, adres veya özel bilgi istemez; yalnızca oyunlarda kullanılan oyuncu adı üzerinden çalışır.</p>
+  </section>
+</section>

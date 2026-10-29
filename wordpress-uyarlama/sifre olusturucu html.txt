@@ -1,0 +1,263 @@
+<section class="uac-page uac-pwgen-page" aria-labelledby="pwgen-title">
+      <header class="uac-hero uac-hero-small uac-pwgen-hero">
+        <p class="uac-eyebrow">Kriptografik &amp; Kavramsal Araç</p>
+        <h1 id="pwgen-title">Akıllı Şifre Oluşturucu</h1>
+        <p class="uac-subtitle">
+          İstediğin metni veya sayıyı ekle, ardından onlarca farklı kural ve kavram kategorisinden seçim yap.
+          Her üretimde <strong>tamamen rastgele</strong> şehirler, ülkeler, az bilinen kavramlar, asal/tek/çift sayılar ve semboller harmanlanarak sana özel benzersiz şifreler üretilir.
+        </p>
+      </header>
+
+      <div class="uac-pwgen-layout">
+        <!-- SOL: Ayarlar ve Geniş Checkbox Kategorileri -->
+        <div class="uac-pwgen-controls">
+          <section class="uac-platform-card uac-pwgen-card">
+            <div class="uac-pwgen-card-head">
+              <h2>1. Kendi Metnini veya Sayını Ekle <small>(İsteğe Bağlı)</small></h2>
+              <span class="uac-pill">Kişiselleştir</span>
+            </div>
+            <p class="uac-empty-note" style="margin-top:0;">Şifrende mutlaka geçmesini istediğin bir kelime, kısaltma veya uğurlu sayı varsa aşağıya yazabilirsin. Boş bırakırsan tamamen seçtiğin özelliklerden rastgele üretilir.</p>
+            <div class="uac-pwgen-custom-grid">
+              <div>
+                <label class="uac-input-label" for="pwCustomText">İstediğin Metin / Kelime</label>
+                <input id="pwCustomText" type="text" maxlength="28" placeholder="Örn: Atom, Kuzey, 2026..." autocomplete="off" spellcheck="false">
+              </div>
+              <div>
+                <label class="uac-input-label" for="pwCustomNumber">İstediğin Sayı / Rakam</label>
+                <input id="pwCustomNumber" type="text" maxlength="16" placeholder="Örn: 42, 1923, 77..." autocomplete="off" spellcheck="false">
+              </div>
+              <div>
+                <label class="uac-input-label" for="pwCustomPlacement">Ekleme Konumu</label>
+                <select id="pwCustomPlacement" class="uac-pwgen-select">
+                  <option value="random" selected>Rastgele Konuma Dağıt (Önerilen)</option>
+                  <option value="start">Şifrenin Başına Koy</option>
+                  <option value="middle">Şifrenin Ortasına Koy</option>
+                  <option value="end">Şifrenin Sonuna Koy</option>
+                </select>
+              </div>
+              <div>
+                <label class="uac-input-label" for="pwSeparator">Parçalar Arası Ayırıcı</label>
+                <select id="pwSeparator" class="uac-pwgen-select">
+                  <option value="none" selected>Bitişik (Ayırıcı Yok)</option>
+                  <option value="random_sym">Rastgele Sembol (!@#$...)</option>
+                  <option value="-">Tire (-)</option>
+                  <option value="_">Alt Çizgi (_)</option>
+                  <option value=".">Nokta (.)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="uac-pwgen-slider-row">
+              <div class="uac-pwgen-slider-label">
+                <span>Hedef Şifre Uzunluğu</span>
+                <b id="pwLengthVal">16 karakter (Tam)</b>
+              </div>
+              <input id="pwMinLength" type="range" min="8" max="64" value="16">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:12.5px;color:#94a3b8;">
+                <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#e2e8f0;">
+                  <input type="checkbox" id="pwExactLengthMode" checked style="accent-color:#00ffcc;width:16px;height:16px;">
+                  <span><b>Tam Uzunluğa Sabitle:</b> Çok fazla özellik seçilse bile şifreyi tam seçtiğin karakter sayısında tut.</span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="uac-platform-card uac-pwgen-card">
+            <div class="uac-pwgen-card-head">
+              <h2>2. Şifre Özellikleri ve Kavram Havuzları</h2>
+              <div class="uac-pwgen-quick-btns">
+                <button type="button" class="uac-btn uac-btn-sm" id="pwSurpriseBtn">🎲 Bana Sürpriz Seç</button>
+                <button type="button" class="uac-btn uac-btn-sm" id="pwSelectAllBtn">Tümünü Seç</button>
+                <button type="button" class="uac-btn uac-btn-sm" id="pwResetBtn">Sıfırla</button>
+              </div>
+            </div>
+            <p class="uac-empty-note" style="margin-top:0;">Seçtiğin her kutucuk, geniş veri havuzundan her seferinde <strong>farklı ve rastgele</strong> bir örnek çekerek şifrene katar.</p>
+
+            <!-- Kategori 1: Karakter & Sayı Kuralları -->
+            <div class="uac-pwgen-group">
+              <h3 class="uac-pwgen-group-title">🔢 Karakter, Sayı &amp; Matematik Kuralları</h3>
+              <div class="uac-pwgen-check-grid">
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="uppercase" checked>
+                  <span><b>Büyük Harf İçersin</b><small>Rastgele A-Z karakterler</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="lowercase" checked>
+                  <span><b>Küçük Harf İçersin</b><small>Rastgele a-z karakterler</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="special" checked>
+                  <span><b>Özel Karakter / Sembol</b><small>! @ # $ % ^ &amp; * ? ~ + =</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="odd_num" checked>
+                  <span><b>Tek Sayı İçersin</b><small>1, 3, 5, 7, 9'dan rastgele kombinasyon</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="even_num">
+                  <span><b>Çift Sayı İçersin</b><small>0, 2, 4, 6, 8'den rastgele kombinasyon</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="prime_num">
+                  <span><b>Asal Sayı İçersin</b><small>13, 17, 29, 43, 73, 97, 137... rastgele</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="fibonacci">
+                  <span><b>Fibonacci Sayısı</b><small>21, 34, 55, 89, 144, 233, 377...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="roman">
+                  <span><b>Roma Rakamı</b><small>IV, VII, IX, XIV, XXI, XLII, XCIX...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="math_const">
+                  <span><b>Matematik / Fizik Sabiti</b><small>Pi (314), Euler (271), Altın Oran (1618)...</small></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Kategori 2: Coğrafya, Şehir & Ülke -->
+            <div class="uac-pwgen-group">
+              <h3 class="uac-pwgen-group-title">🌍 Şehir, Ülke &amp; Coğrafya</h3>
+              <div class="uac-pwgen-check-grid">
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="tr_city">
+                  <span><b>Türkiye'den Şehir</b><small>81 ilden rastgele biri (Sinop, Mardin, Hatay...)</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="tr_plate">
+                  <span><b>İl Plaka Kodu</b><small>01 - 81 arası rastgele plaka kodu</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="country">
+                  <span><b>Dünya Ülkesi</b><small>İzlanda, Japonya, Şili, Norveç, Peru...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="capital_ancient">
+                  <span><b>Başkent veya Antik Kent</b><small>Efes, Göbeklitepe, Kyoto, Petra, Semerkant...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="nature_geo">
+                  <span><b>Dağ, Nehir veya Çukur</b><small>Kaçkar, Mariana, Altay, Amazon, Fırat...</small></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Kategori 3: Az Bilinen Kavramlar, Bilim & Uzay -->
+            <div class="uac-pwgen-group">
+              <h3 class="uac-pwgen-group-title">🌌 Az Bilinen Kavramlar, Bilim &amp; Mitoloji</h3>
+              <div class="uac-pwgen-check-grid">
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="rare_concept" checked>
+                  <span><b>Az Bilinen Derin Kavramlar</b><small>Petrichor, Sonder, Kairos, Vellichor, Ikigai...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="element">
+                  <span><b>Periyodik Element &amp; Atom No</b><small>Xenon54, Kobalt27, Titanyum22, İridyum77...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="space">
+                  <span><b>Uzay, Yıldız &amp; Bulutsu</b><small>Sirius, Quasar, Andromeda, Pulsar, Kepler...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="mythology">
+                  <span><b>Türk &amp; Dünya Mitolojisi</b><small>Tulpar, Simurg, Tengri, Anka, Fenrir, Atlas...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="cyber_tech">
+                  <span><b>Siber &amp; Kuantum Terimi</b><small>Kernel, Entropy, Cipher, Qubit, Vector...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="history_year">
+                  <span><b>Tarihsel Dönüm Yılı</b><small>1071, 1453, 1923, 1969, 1789...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="animal_phenom">
+                  <span><b>Yırtıcı / Doğa Olayı</b><small>Vaşak, Albatros, Kuzgun, Aurora, Tayfun...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="gem_color">
+                  <span><b>Değerli Taş veya Renk Kodu</b><small>Obsidyen, Safir, Kehribar, Zümrüt...</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="chess_move">
+                  <span><b>Satranç Notasyonu</b><small>Nf3, Bc4, Qh5, Rxd8#, O-O-O...</small></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Kategori 4: Dönüşüm & Stil Modifikasyonları -->
+            <div class="uac-pwgen-group" style="margin-bottom:0;">
+              <h3 class="uac-pwgen-group-title">⚡ Harf Dönüşümü &amp; Ekstra Güvenlik</h3>
+              <div class="uac-pwgen-check-grid">
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="ascii_only">
+                  <span><b>Türkçe Karakterleri İngilizceye Çevir</b><small>ş→s, ğ→g, ı→i, ö→o, ü→u, ç→c (Uyumluluk için)</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="leet_partial">
+                  <span><b>Kısmi Leet Dönüşümü</b><small>Bazı harfleri rakama çevir (a→4, e→3, o→0)</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="random_case">
+                  <span><b>Sürpriz Büyük/Küçük Harf Vurgusu</b><small>Kelime içindeki rastgele harfleri büyüt</small></span>
+                </label>
+                <label class="uac-pwgen-check">
+                  <input type="checkbox" data-rule="no_ambiguous">
+                  <span><b>Karışan Karakterleri Hariç Tut</b><small>0/O, 1/l/I gibi benzer karakterleri azalt</small></span>
+                </label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- SAĞ: Canlı Üretim Sonucu, Entropi, Parça Analizi ve Alternatifler -->
+        <aside class="uac-pwgen-output-col">
+          <section class="uac-platform-card uac-pwgen-result-card">
+            <div class="uac-panel-title">ÜRETİLEN ŞİFRE</div>
+
+            <div class="uac-pwgen-main-box">
+              <output id="pwMainOutput" class="uac-pwgen-code" aria-live="polite">Üretiliyor...</output>
+              <div class="uac-pwgen-main-actions">
+                <button type="button" class="uac-btn uac-btn-primary" id="pwGenerateBtn">🔄 Yeniden Üret</button>
+                <button type="button" class="uac-btn" id="pwCopyBtn">📋 Kopyala</button>
+              </div>
+            </div>
+
+            <div id="pwCopyStatus" class="uac-pwgen-copy-status" aria-live="polite"></div>
+
+            <!-- Güç ve Entropi Ölçer -->
+            <div class="uac-pwgen-meter-wrap">
+              <div class="uac-pwgen-meter-head">
+                <span id="pwStrengthLabel">Güç: Hesaplanıyor</span>
+                <b id="pwEntropyLabel">0 bit · 0 karakter</b>
+              </div>
+              <div class="uac-daily-meter"><i id="pwStrengthBar"></i></div>
+            </div>
+
+            <!-- Parça Analizi (Breakdown) -->
+            <div class="uac-pwgen-breakdown-wrap">
+              <h3>Bu Şifrede Neler Kullanıldı?</h3>
+              <div id="pwBreakdownList" class="uac-pwgen-tags"></div>
+            </div>
+
+            <!-- Tek Tıkla Alternatif Varyasyonlar -->
+            <div class="uac-pwgen-variants-wrap">
+              <h3>Aynı Kurallarla 4 Farklı Rastgele Varyasyon <small>(Tıkla Kopyala)</small></h3>
+              <div id="pwVariantsList" class="uac-pwgen-variants"></div>
+            </div>
+          </section>
+
+          <section class="uac-platform-card">
+            <h2>Neden Kavramsal Şifre?</h2>
+            <p class="uac-empty-note" style="margin:0;line-height:1.65;">
+              Klasik karmaşık şifreleri (<code>x9#kP!2m</code>) hatırlamak zordur; basit kelimeler ise sözlük saldırılarına açıktır.
+              <strong>Kavramsal + Rastgele</strong> yöntemde ise örneğin bir <em>az bilinen kavram</em> + <em>asal sayı</em> + <em>antik kent</em> + <em>özel sembol</em> birleşir: hem akılda kalıcı bir hikayesi olur hem de her üretimde farklı kombinasyon çıktığı için tahmin edilemez.
+            </p>
+            <p class="uac-pin-note" style="margin-top:10px;">
+              🔒 <strong>Tam Gizlilik:</strong> Burada üretilen şifreler yalnızca tarayıcında (`window.crypto`) anlık oluşturulur; hiçbir yere kaydedilmez ve gönderilmez.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </section>

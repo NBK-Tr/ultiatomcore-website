@@ -1,0 +1,147 @@
+<section class="uac-page uac-klavye" aria-labelledby="klavye-title">
+  <header class="uac-hero uac-hero-small uac-klavye-intro">
+    <p class="uac-eyebrow">Türkçe klavye hız oyunu</p>
+    <h1 id="klavye-title" class="game-title">Klavye Muharebesi</h1>
+    <p class="uac-subtitle">Ekrana gelen kelimeleri doğru yazarak düşmanları yok et, seviye atla ve liderlik tablosuna gir. Oyun hızlı yazma, dikkat ve hedef takibini aynı anda ölçer.</p>
+  </header>
+
+  <section class="uac-section uac-readable" aria-labelledby="klavye-how-title">
+    <h2 id="klavye-how-title">Nasıl oynanır?</h2>
+    <p>Bilgisayarda klavyeden harfleri yaz. Telefonda oyun alanına dokun veya sağ alttaki klavye butonunu kullan. Ekrandaki kelimenin sıradaki harfini doğru yazdığında hedefe kilitlenirsin; kelime tamamlandığında düşman yok olur ve skor kazanırsın.</p>
+    <ul class="uac-feature-list">
+      <li>Yanlış harf yazarsan hedefi kaybedebilir, combo serini düşürebilirsin.</li>
+      <li>Kelime aşağıya yaklaştıkça tehlike artar; önce aşağıdaki düşmanlara odaklanmak güvenlidir.</li>
+      <li>Seviye yükseldikçe kelimeler uzar, düşmanlar daha hızlı gelir ve dikkat hatası daha pahalı hale gelir.</li>
+      <li>Aynı oyuncu adını kullanırsan skorun liderlik ve profil sisteminde daha düzenli takip edilir.</li>
+    </ul>
+  </section>
+
+  <section class="uac-section uac-readable" aria-labelledby="klavye-score-title">
+    <h2 id="klavye-score-title">Puanlama ve oyun taktikleri</h2>
+    <p>Kısa kelimeler oyuna alışmak için daha kolaydır, orta ve zor kelimeler ise daha yüksek puan getirir. En iyi skor için sadece hızlı yazmak yetmez; hedef seçimini doğru yapmak da gerekir. Eğer ekranda birden fazla kelime varsa, aşağıya yaklaşan veya uzunluğu daha kısa olan hedefleri önce bitirmek can kaybını azaltır.</p>
+    <p>Combo sistemi hatasız oynayan oyuncuyu ödüllendirir. Bu yüzden rastgele tuşlara basmak yerine kelimeyi gözle takip edip sıradaki harfi yazmak daha iyi sonuç verir. Mobilde oynarken ekranın zıplamaması için oyun alanına dokunduktan sonra sanal klavye ile devam etmen önerilir.</p>
+  </section>
+<div id="z-game-wrapper">
+    <canvas id="gameCanvas"></canvas>
+
+    <input
+      type="text"
+      id="mobile-input"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      inputmode="text"
+      data-form-type="other"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+
+    <div id="z-hud">
+      <div class="hud-block">
+        <span class="hud-label">SKOR</span>
+        <span class="hud-val" id="z-score">0</span>
+      </div>
+      <div class="hud-block" id="mute-hud" style="cursor: pointer; pointer-events: auto;">
+        <span class="hud-label">SES</span>
+        <span class="hud-val" id="mute-icon" onclick="window.toggleMute()">🔊</span>
+        <input type="range" id="volume-slider" min="0" max="100" value="70">
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">LEVEL</span>
+        <span class="hud-val" id="z-level">1</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">CAN</span>
+        <div id="lives-display">
+          <div class="life-dot" id="l1"></div>
+          <div class="life-dot" id="l2"></div>
+          <div class="life-dot" id="l3"></div>
+        </div>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">BEST</span>
+        <span class="hud-val" id="z-best">0</span>
+      </div>
+    </div>
+
+    <div id="level-transition">
+      <div id="lt-text">SEVİYE 2</div>
+      <div id="lt-sub">DEVAM ET!</div>
+    </div>
+
+    <div id="notif"></div>
+
+    <div id="combo-display" aria-live="polite">
+      <span>COMBO</span>
+      <strong>x1</strong>
+    </div>
+
+    <div class="overlay" id="start-overlay">
+      <h2>KLAVYE MUHAREBESİ</h2>
+
+      <div id="name-step">
+        <p>Lider tablosuna kaydolmak ve sohbet hakkını açmak için oyuncu adını ve PIN kodunu gir. Aynı PIN ile telefonda/PC'de devam edebilirsin.</p>
+        <input type="text" id="player-name-input"
+          placeholder="OYUNCU ADI" maxlength="20"
+          autocomplete="off" spellcheck="false">
+        <input type="password" id="player-pin-input" placeholder="PIN (4-12 karakter)" maxlength="12" autocomplete="off" spellcheck="false">
+        <p class="uac-pin-note">PIN gizli tutulur; aynı oyuncu adını başka cihazda kullanmak için gerekir.</p>
+        <div id="name-error"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <button class="btn" id="name-confirm-btn" onclick="setPlayerName()">ONAYLA</button>
+          <button class="btn danger" onclick="skipName()">ATLA</button>
+        </div>
+      </div>
+
+      <div id="ready-step" style="display:none;">
+        <div style="color:#558;font-size:11px;letter-spacing:2px;margin-bottom:4px;">HOŞ GELDİN</div>
+        <div id="display-name">KOMUTAN</div>
+
+        <div style="color:#446;font-size:10px;letter-spacing:2px;margin:6px 0 2px;">GEMİ SEÇ</div>
+        <div class="skin-row" id="skin-selector">
+          <div class="skin-opt" data-skin="0" title="Klasik">🚀</div>
+          <div class="skin-opt" data-skin="1" title="UFO">🛸</div>
+          <div class="skin-opt" data-skin="2" title="Phoenix">🔥</div>
+          <div class="skin-opt" data-skin="3" title="Cyber">⚡</div>
+        </div>
+
+        <p style="margin-top:6px;font-size:11px;color:#446;">
+          Kelimeleri yaz ve imha et!
+        </p>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <button class="btn" onclick="startGame()">SAVAŞA BAŞLA</button>
+          <button class="btn danger" onclick="changeName()">İSİM DEĞİŞTİR</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="z-game-over">
+      <h2 style="color:var(--red); text-shadow:0 0 30px var(--red);">SİSTEM İMHASI</h2>
+      <div style="color:#aaa; font-size:13px; margin:4px 0;">
+        SKOR: <span style="color:var(--yellow);font-family:'Orbitron',sans-serif;" id="final-score">0</span>
+      </div>
+      <div style="color:#aaa; font-size:13px; margin:4px 0;">
+        EN İYİ COMBO: <span style="color:var(--cyan);font-family:'Orbitron',sans-serif;" id="final-combo">0</span>
+      </div>
+
+      <div class="score-table" id="score-table">
+        <div style="color:#334;font-size:10px;text-align:center;">YÜKLENİYOR...</div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
+        <button class="btn" onclick="restartGame()">YENİDEN BAŞLAT</button>
+        <button class="btn danger" onclick="showStartScreen()">ANA MENÜ</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="kb-trigger" type="button" onclick="window.focusGameKeyboard && window.focusGameKeyboard()">⌨️</button>
+<section class="uac-section uac-readable" aria-labelledby="klavye-faq-title">
+    <h2 id="klavye-faq-title">Sık sorulan sorular</h2>
+    <p><strong>Gerçek klavye hız testi mi?</strong> Bu oyun klasik hız testinden farklıdır. Burada yalnızca dakika başına kelime değil; hedef seçimi, hata yapmama ve seviye ilerletme de önemlidir.</p>
+    <p><strong>Telefonda oynanır mı?</strong> Evet. Sağ alttaki klavye butonu sanal klavyeyi açmak için kullanılır. Daha iyi sonuç için ekranı yatay tutabilir ve kelimeye odaklanabilirsin.</p>
+    <p><strong>Skorum neden kaydolmadı?</strong> Skorun kaydolması için oyuncu adının geçerli olması, oyun verisinin normal görünmesi ve bağlantının kesilmemesi gerekir. Hileli veya hatalı görünen skorlar güvenlik sistemi tarafından reddedilebilir.</p>
+  </section>
+</section>

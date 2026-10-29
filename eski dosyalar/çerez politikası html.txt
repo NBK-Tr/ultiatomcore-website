@@ -1,0 +1,5 @@
+<section class="uac-page uac-readable" aria-labelledby="cookie-title">
+  <header class="uac-hero uac-hero-small"><p class="uac-eyebrow">Çerezler</p><h1 id="cookie-title">Çerez Politikası</h1><p class="uac-subtitle">UltiAtomCore, oyunların ve güvenlik sistemlerinin çalışması için çerez ve yerel depolama kullanabilir.</p></header>
+  <section class="uac-section"><h2>Kullanım amaçları</h2><ul class="uac-feature-list"><li>Oyuncu adı, ses tercihi ve oyun ayarlarını hatırlamak.</li><li>Skor, profil ve günlük seri özelliklerini düzgün çalıştırmak.</li><li>Spam, hile ve aşırı istekleri azaltmak.</li><li>Reklam gösterimi ve ölçümleme sistemlerini çalıştırmak.</li></ul></section>
+  <section class="uac-section"><h2>Tarayıcı ayarları</h2><p>Çerezleri tarayıcı ayarlarından silebilir veya sınırlandırabilirsin. Bazı oyun özellikleri bu durumda yeniden isim istemek veya ayarları sıfırlamak gibi davranışlar gösterebilir.</p></section>
+</section>
